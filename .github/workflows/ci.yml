@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH || true
+          echo "$HOME/.local/bin" >> $GITHUB_PATH || true
+          echo "$HOME/.uv/bin" >> $GITHUB_PATH || true
+
+      - name: Show uv version
+        run: uv --version
+
+      - name: Install package and test deps
+        run: |
+          uv pip install -e .
+          uv pip install pytest pytest-cov
+
+      - name: Run tests
+        run: uv run --with pytest pytest -q
+
+
