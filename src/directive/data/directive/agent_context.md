@@ -6,17 +6,11 @@ Attach this file + the feature spec to the agent for every build.
 ---
 
 ## Languages & Frameworks
-- Backend: Python (3.11+)  
-- Frontend: TypeScript + React  
-- Package management: uv (Python), pnpm (JS/TS)  
-- Preferred frameworks/libraries: [list]  
+- Backend: Python (3.13+) 
+- Package management: uv (Python)
 
 ## Project Conventions
-- Code style: Black for Python, Prettier for TS  
-- Type system: mypy for Python, strict TypeScript  
-- Testing: pytest for backend, Jest/Playwright for frontend  
-- Linting: flake8, eslint  
-- CI: GitHub Actions (tests + lint must pass)  
+
 
 ## Security & Privacy
 - Secrets in env vars only, never hardcoded  
@@ -24,9 +18,7 @@ Attach this file + the feature spec to the agent for every build.
 - No PII in logs  
 
 ## Performance & Reliability
-- Target: p95 latency < 200ms for API endpoints  
-- Retries on transient errors (idempotent)  
-- Logging + metrics via [tool/service]  
+
 
 ## Dependencies
 - Use only approved packages  
@@ -45,7 +37,7 @@ Attach this file + the feature spec to the agent for every build.
 
 ## Commit & PR Conventions
 - Conventional commits (`feat:`, `fix:`, `chore:`)  
-- Every PR must include a Spec Card (`specs/feature-name.md`)  
+- Every PR must include a Spec Card (`directive/specs/feature-name.md`)  
 
 ---
 
@@ -63,3 +55,4 @@ Attach this file + the feature spec to the agent for every build.
 - Naming: map tests to Spec acceptance criteria (e.g., `AC-3`)  
 - Commit order per task: `test:` → `feat:` → `refactor:`  
 - CI blocks merge unless all tests pass  
+
