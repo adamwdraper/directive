@@ -83,8 +83,8 @@ def cmd_mcp_serve(args: argparse.Namespace) -> int:
     try:
         from .server import serve_stdio
     except Exception as exc:  # ImportError or others
-        _err("MCP server dependencies not available. Install the 'mcp' package.")
-        _err("Try: uv add mcp")
+        _err("MCP server could not start due to missing or incompatible dependencies for directive's server.")
+        _err("Ensure this package is installed correctly and try again (e.g., 'uv pip install -e .').")
         _err(f"Details: {exc}")
         return 1
 
@@ -100,7 +100,7 @@ def cmd_bundle(args: argparse.Namespace) -> int:
         # Helpful list of available templates
         try:
             files = list_directive_files(Path.cwd())
-            available = [f for f in files if "/templates/" in f or "\\templates\\" in f]
+            available = [f for f in files if "templates" in Path(f).parts]
         except Exception:
             available = []
         _err("Available templates:")

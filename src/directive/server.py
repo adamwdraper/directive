@@ -61,8 +61,10 @@ def _result(id_value: Any, result: Any) -> None:
 
 
 def serve_stdio(root: Path) -> int:
+    # Ensure we consistently resolve the repo root and directive root once.
+    repo_root = root.parent
     try:
-        directive_root = get_directive_root(root.parent)
+        directive_root = get_directive_root(repo_root)
     except Exception:
         directive_root = root
 
@@ -76,20 +78,20 @@ def serve_stdio(root: Path) -> int:
 
         try:
             if method == "directive.files.list":
-                files = list_directive_files(directive_root.parent)
+                files = list_directive_files(repo_root)
                 _result(id_value, {"files": files})
             elif method == "directive.file.get":
                 path = params.get("path")
                 if not isinstance(path, str):
                     raise ValueError("path must be a string")
-                content = read_directive_file(directive_root.parent, path)
+                content = read_directive_file(repo_root, path)
                 _result(id_value, {"path": path, "content": content})
             elif method == "spec.template":
-                _result(id_value, build_template_bundle("spec_template.md", directive_root.parent))
+                _result(id_value, build_template_bundle("spec_template.md", repo_root))
             elif method == "impact.template":
-                _result(id_value, build_template_bundle("impact_template.md", directive_root.parent))
+                _result(id_value, build_template_bundle("impact_template.md", repo_root))
             elif method == "tdr.template":
-                _result(id_value, build_template_bundle("tdr_template.md", directive_root.parent))
+                _result(id_value, build_template_bundle("tdr_template.md", repo_root))
             else:
                 _error(id_value, -32601, f"Method not found: {method}")
         except FileNotFoundError as e:

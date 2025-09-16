@@ -39,7 +39,12 @@ def list_directive_files(repo_root: Path | None = None) -> List[str]:
 
 def read_directive_file(repo_root: Path | None, path: str) -> str:
     root = get_directive_root(repo_root)
-    full = _normalize_and_validate_path(root, Path(path).relative_to("directive").as_posix() if path.startswith("directive/") else path)
+    # Normalize provided path to a path relative to directive/ root
+    if path.startswith("directive/"):
+        normalized_path = Path(path).relative_to("directive").as_posix()
+    else:
+        normalized_path = path
+    full = _normalize_and_validate_path(root, normalized_path)
     if not full.exists() or not full.is_file():
         raise FileNotFoundError(f"File not found under directive/: {path}")
     return full.read_text(encoding="utf-8")
