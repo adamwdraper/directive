@@ -6,7 +6,7 @@ This is the **standard workflow** the agent must follow for every new feature sp
 ---
 
 Note: Templates to use during this process are located in `/docs/templates/`:
-- Spec: `/docs/templates/spec_card_template.md`
+- Spec: `/docs/templates/spec_template.md`
 - Impact: `/docs/templates/impact_template.md`
 - TDR: `/docs/templates/tdr_template.md`
 
