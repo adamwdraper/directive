@@ -22,6 +22,18 @@ It separates **product intent** (Spec) from **engineering constraints** (Agent C
 - `directive/file.get`: Read a file under `directive/` by path
 - `directive/files.list`: List files under `directive/`
 
+### Using with Cursor (MCP)
+1. Ensure your project has Directive installed and initialized:
+   - `uv add directive`
+   - `uv run directive init`
+2. In Cursor, add an MCP server entry that launches Directive:
+   - Name: "Directive"
+   - Command: `uv`
+   - Args: `run directive mcp serve`
+   - Working directory: your repo root (where `directive/` lives)
+3. Save settings and open an AI chat in the same workspace. The agent should auto-discover tools.
+4. Sanity check: ask the agent "Create a new spec". It should use the Spec template bundle it discovers. If it can’t find tools, confirm the server command runs in your shell and `uv` is on PATH.
+
 ## Workflow
 
 Use this flow whenever you ask an agent to write code.
