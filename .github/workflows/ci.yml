@@ -29,6 +29,9 @@ jobs:
       - name: Show uv version
         run: uv --version
 
+      - name: Create uv virtual environment
+        run: uv venv
+
       - name: Install package and test deps
         run: |
           uv pip install -e .
