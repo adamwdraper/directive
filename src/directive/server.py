@@ -60,6 +60,57 @@ def _result(id_value: Any, result: Any) -> None:
     _write_message({"jsonrpc": "2.0", "id": id_value, "result": result})
 
 
+# ---- MCP helpers ----
+
+def _tool_descriptors() -> List[Dict[str, Any]]:
+    return [
+        {
+            "name": "directive/files.list",
+            "title": "List Directive Files",
+            "description": "List all files under the repository’s directive/ directory (context and templates).",
+            "inputSchema": {"type": "object", "additionalProperties": False, "properties": {}},
+        },
+        {
+            "name": "directive/file.get",
+            "title": "Read Directive File",
+            "description": "Read a file under directive/ by path and return its full contents verbatim.",
+            "inputSchema": {
+                "type": "object",
+                "additionalProperties": False,
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "Path under directive/ (e.g., directive/agent_context.md)",
+                    }
+                },
+                "required": ["path"],
+            },
+        },
+        {
+            "name": "directive/spec.template",
+            "title": "Spec Template Bundle",
+            "description": "Return Agent Operating Procedure, Agent Context, and the Spec template, plus a concise Primer for drafting a new Spec.",
+            "inputSchema": {"type": "object", "additionalProperties": False, "properties": {}},
+        },
+        {
+            "name": "directive/impact.template",
+            "title": "Impact Template Bundle",
+            "description": "Return Agent Operating Procedure, Agent Context, and the Impact template, plus a concise Primer for drafting an Impact analysis.",
+            "inputSchema": {"type": "object", "additionalProperties": False, "properties": {}},
+        },
+        {
+            "name": "directive/tdr.template",
+            "title": "TDR Template Bundle",
+            "description": "Return Agent Operating Procedure, Agent Context, and the TDR template, plus a concise Primer for drafting a Technical Design Review.",
+            "inputSchema": {"type": "object", "additionalProperties": False, "properties": {}},
+        },
+    ]
+
+
+def _wrap_text_content(text: str) -> Dict[str, Any]:
+    return {"content": [{"type": "text", "text": text}]}
+
+
 def serve_stdio(root: Path) -> int:
     # Ensure we consistently resolve the repo root and directive root once.
     repo_root = root.parent
@@ -77,7 +128,46 @@ def serve_stdio(root: Path) -> int:
         params = msg.get("params") or {}
 
         try:
-            if method == "directive.files.list":
+            # MCP tool discovery
+            if method == "tools/list":
+                _result(id_value, {"tools": _tool_descriptors()})
+
+            # MCP tool execution
+            elif method == "tools/call":
+                name = params.get("name")
+                arguments = params.get("arguments") or {}
+                if not isinstance(name, str):
+                    raise ValueError("name must be a string")
+
+                # Dispatch based on tool name
+                if name == "directive/files.list":
+                    files = list_directive_files(repo_root)
+                    _result(id_value, _wrap_text_content(json.dumps({"files": files})))
+
+                elif name == "directive/file.get":
+                    path = arguments.get("path")
+                    if not isinstance(path, str):
+                        raise ValueError("path must be a string")
+                    content = read_directive_file(repo_root, path)
+                    _result(id_value, _wrap_text_content(json.dumps({"path": path, "content": content})))
+
+                elif name == "directive/spec.template":
+                    bundle = build_template_bundle("spec_template.md", repo_root)
+                    _result(id_value, _wrap_text_content(json.dumps(bundle)))
+
+                elif name == "directive/impact.template":
+                    bundle = build_template_bundle("impact_template.md", repo_root)
+                    _result(id_value, _wrap_text_content(json.dumps(bundle)))
+
+                elif name == "directive/tdr.template":
+                    bundle = build_template_bundle("tdr_template.md", repo_root)
+                    _result(id_value, _wrap_text_content(json.dumps(bundle)))
+
+                else:
+                    _error(id_value, -32601, f"Tool not found: {name}")
+
+            # Back-compat custom methods
+            elif method == "directive.files.list":
                 files = list_directive_files(repo_root)
                 _result(id_value, {"files": files})
             elif method == "directive.file.get":

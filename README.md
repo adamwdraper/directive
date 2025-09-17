@@ -3,12 +3,25 @@
 A lightweight, implementation‑agnostic workflow for building software with AI coding agents.  
 It separates **product intent** (Spec) from **engineering constraints** (Agent Context) and enforces an **analyze → design → TDD** loop.
 
+## Quickstart (CLI + MCP)
+
+- Install (using uv):
+  - In a project: `uv add directive` (adds to `pyproject.toml` and `uv.lock`)
+- Initialize defaults in your repo:
+  - `uv run directive init` (non-destructive; creates `directive/` with AOP, Context, and templates)
+- Start the MCP server (stdio):
+  - `uv run directive mcp serve`
+  - Your agent can fetch Spec/Impact/TDR templates and context over MCP. MCP-aware IDEs (e.g., Cursor) can automatically discover these tools.
+- (Optional) Inspect a bundle directly:
+  - `uv run directive bundle spec_template.md` (prints a JSON bundle to stdout)
+
 ## Workflow
 
 Use this flow whenever you ask an agent to write code.
 
 Step 1 — Spec (collaborative, behavior/UX‑only)
-- Include in context:
+- If your agent supports MCP: ensure the server is running (`uv run directive mcp serve`); the agent will fetch AOP, Agent Context, and the Spec template automatically.
+- Or include manually:
   - `/directive/agent_operating_procedure.md`
   - `/directive/agent_context.md`
   - `/directive/templates/spec_template.md`
@@ -18,7 +31,8 @@ Create /directive/specs/<feature>/ (if missing) and scaffold /directive/specs/<f
 ```
 
 Step 2 — Impact Analysis (approve before TDR)
-- Include in context:
+- If your agent supports MCP: ensure the server is running; the agent will fetch AOP, Agent Context, and the Impact template automatically (include your authored Spec as well).
+- Or include manually:
   - `/directive/specs/<feature>/spec.md`
   - `/directive/agent_operating_procedure.md`
   - `/directive/agent_context.md`
@@ -29,7 +43,8 @@ Produce /directive/specs/<feature>/impact.md using the Impact template. Call out
 ```
 
 Step 3 — Technical Design Review (TDR) (approve before coding)
-- Include in context:
+- If your agent supports MCP: ensure the server is running; the agent will fetch AOP, Agent Context, and the TDR template automatically (include your authored Spec and Impact as well).
+- Or include manually:
   - `/directive/specs/<feature>/spec.md`
   - `/directive/specs/<feature>/impact.md`
   - `/directive/agent_operating_procedure.md`
