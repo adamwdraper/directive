@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "directive"
 version = "0.0.1"
-description = "Minimal placeholder package to reserve the name."
+description = "Directive CLI and MCP server scaffolding for file-driven agent context."
 readme = "README.md"
 requires-python = ">=3.8"
 license = { file = "LICENSE" }
@@ -17,7 +17,18 @@ classifiers = [
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
-keywords = ["placeholder"]
+keywords = ["directive", "mcp", "cli", "agent", "templates"]
+
+dependencies = []
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8.0",
+  "pytest-cov>=5.0",
+]
+
+[project.scripts]
+directive = "directive.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/adamwdraper/directive"
@@ -26,5 +37,10 @@ Issues = "https://github.com/adamwdraper/directive/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/directive"]
+
+[tool.hatch.build]
+include = [
+  "src/directive/data/**",
+]
 
 

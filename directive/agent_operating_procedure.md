@@ -5,20 +5,20 @@ This is the **standard workflow** the agent must follow for every new feature sp
 
 ---
 
-Note: Templates to use during this process are located in `/docs/templates/`:
-- Spec: `/docs/templates/spec_card_template.md`
-- Impact: `/docs/templates/impact_template.md`
-- TDR: `/docs/templates/tdr_template.md`
+Note: Templates to use during this process are located in `/directive/templates/`:
+- Spec: `/directive/templates/spec_template.md`
+- Impact: `/directive/templates/impact_template.md`
+- TDR: `/directive/templates/tdr_template.md`
 
 ## Inputs
-- Spec folder for this PR (`/specs/<feature>/`): contains `spec.md` and agent-produced docs (`impact.md`, `tdr.md`)
-- Agent Technical Context (`/docs/agent_context.md`)
+- Spec folder for this PR (`/directive/specs/<feature>/`): contains `spec.md` and agent-produced docs (`impact.md`, `tdr.md`)
+- Agent Technical Context (`/directive/agent_context.md`)
 - This AOP file
 
 ## Deliverables (before any code)
-1. **Spec** — collaboratively drafted and accepted — saved at `/specs/<feature>/spec.md`
-2. **Impact Analysis** — save as `/specs/<feature>/impact.md`
-3. **Technical Design Review (TDR)** draft — save as `/specs/<feature>/tdr.md`
+1. **Spec** — collaboratively drafted and accepted — saved at `/directive/specs/<feature>/spec.md`
+2. **Impact Analysis** — save as `/directive/specs/<feature>/impact.md`
+3. **Technical Design Review (TDR)** draft — save as `/directive/specs/<feature>/tdr.md`
 
 ---
 
@@ -45,7 +45,7 @@ From the spec, identify:
 **Gate**: Reviewer signs off on `impact.md` before proceeding to TDR.
 
 ## Step 3 — Draft the TDR
-Create `/specs/<feature>/tdr.md` using the TDR template at `/docs/templates/tdr_template.md`. Keep it high-level and implementation‑agnostic but **decisive** about interfaces and behavior. Link to examples and data contracts.
+Create `/directive/specs/<feature>/tdr.md` using the TDR template at `/directive/templates/tdr_template.md`. Keep it high-level and implementation‑agnostic but **decisive** about interfaces and behavior. Link to examples and data contracts.
 
 **Gate**: Wait for reviewer (human) approval comments.
 
