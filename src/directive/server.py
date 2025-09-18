@@ -80,7 +80,7 @@ def _tool_descriptors() -> List[Dict[str, Any]]:
                 "properties": {
                     "path": {
                         "type": "string",
-                        "description": "Path under directive/ (e.g., directive/agent_context.md)",
+                        "description": "Path under directive/ (e.g., directive/reference/agent_context.md)",
                     }
                 },
                 "required": ["path"],

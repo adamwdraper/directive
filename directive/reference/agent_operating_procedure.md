@@ -5,14 +5,14 @@ This is the **standard workflow** the agent must follow for every new feature sp
 
 ---
 
-Note: Templates to use during this process are located in `/directive/templates/`:
-- Spec: `/directive/templates/spec_template.md`
-- Impact: `/directive/templates/impact_template.md`
-- TDR: `/directive/templates/tdr_template.md`
+Note: Templates to use during this process are located in `/directive/reference/templates/`:
+- Spec: `/directive/reference/templates/spec_template.md`
+- Impact: `/directive/reference/templates/impact_template.md`
+- TDR: `/directive/reference/templates/tdr_template.md`
 
 ## Inputs
 - Spec folder for this PR (`/directive/specs/<feature>/`): contains `spec.md` and agent-produced docs (`impact.md`, `tdr.md`)
-- Agent Technical Context (`/directive/agent_context.md`)
+- Agent Technical Context (`/directive/reference/agent_context.md`)
 - This AOP file
 
 ## Deliverables (before any code)
@@ -45,7 +45,7 @@ From the spec, identify:
 **Gate**: Reviewer signs off on `impact.md` before proceeding to TDR.
 
 ## Step 3 — Draft the TDR
-Create `/directive/specs/<feature>/tdr.md` using the TDR template at `/directive/templates/tdr_template.md`. Keep it high-level and implementation‑agnostic but **decisive** about interfaces and behavior. Link to examples and data contracts.
+Create `/directive/specs/<feature>/tdr.md` using the TDR template at `/directive/reference/templates/tdr_template.md`. Keep it high-level and implementation‑agnostic but **decisive** about interfaces and behavior. Link to examples and data contracts.
 
 **Gate**: Wait for reviewer (human) approval comments.
 

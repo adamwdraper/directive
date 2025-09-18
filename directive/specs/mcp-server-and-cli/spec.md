@@ -35,7 +35,7 @@ Edge case (template missing):
 ## UX Links
 - Designs: n/a  
 - Prototype: n/a  
-- Copy/Content: `directive/agent_context.md`, `directive/agent_operating_procedure.md`  
+- Copy/Content: `directive/reference/agent_context.md`, `directive/reference/agent_operating_procedure.md`  
 
 ## Requirements
 - Must be file‑driven and self‑contained under `directive/`.  
@@ -50,11 +50,11 @@ Edge case (template missing):
 - Must show helpful errors if required files are missing and suggest remedies.  
 
 ## Acceptance Criteria
-- Given a repo without `directive/`, when a human runs “init” via the CLI, then a `directive/` directory is created with `agent_context.md`, `agent_operating_procedure.md`, `templates/`, and an empty `specs/` folder, without overwriting existing files by default.  
-- Given `directive/` exists, when an agent requests a spec drafting bundle (e.g., `context.bundle(template='spec_template.md')`), then the response includes the full contents of `directive/agent_operating_procedure.md`, `directive/agent_context.md`, and `directive/templates/spec_template.md`, plus their paths.  
-- Given `directive/templates/spec_template.md` is present, when the agent calls `spec.template()`, then the returned template content matches the on‑disk file verbatim (no summarization).  
-- Given `directive/templates/impact_template.md` is present, when the agent calls `impact.template()`, then the returned template content matches the on‑disk file verbatim (no summarization).  
-- Given `directive/templates/tdr_template.md` is present, when the agent calls `tdr.template()`, then the returned template content matches the on‑disk file verbatim (no summarization).  
+- Given a repo without `directive/`, when a human runs “init” via the CLI, then a `directive/` directory is created with `reference/agent_context.md`, `reference/agent_operating_procedure.md`, `reference/templates/`, and an empty `specs/` folder, without overwriting existing files by default.  
+- Given `directive/` exists, when an agent requests a spec drafting bundle (e.g., `context.bundle(template='spec_template.md')`), then the response includes the full contents of `directive/reference/agent_operating_procedure.md`, `directive/reference/agent_context.md`, and `directive/reference/templates/spec_template.md`, plus their paths.  
+- Given `directive/reference/templates/spec_template.md` is present, when the agent calls `spec.template()`, then the returned template content matches the on‑disk file verbatim (no summarization).  
+- Given `directive/reference/templates/impact_template.md` is present, when the agent calls `impact.template()`, then the returned template content matches the on‑disk file verbatim (no summarization).  
+- Given `directive/reference/templates/tdr_template.md` is present, when the agent calls `tdr.template()`, then the returned template content matches the on‑disk file verbatim (no summarization).  
 - Given an agent requests a bundle, then the response includes a `primer` string with concise AOP guidance alongside the full AOP, Agent Context, and template contents.  
 - Given a feature spec folder already exists, when the agent requests a bundle for the same feature, then the tool returns the same full docs and template without attempting any writes, and may include a helpful note that the spec path already exists.  
 - Given the template file is missing, when the agent requests a bundle, then the tool returns a helpful error listing available templates and suggests running the CLI `update` to restore defaults.  

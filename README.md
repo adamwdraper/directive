@@ -26,13 +26,29 @@ It separates **product intent** (Spec) from **engineering constraints** (Agent C
 1. Ensure your project has Directive installed and initialized:
    - `uv add directive`
    - `uv run directive init`
-2. In Cursor, add an MCP server entry that launches Directive:
-   - Name: "Directive"
-   - Command: `uv`
-   - Args: `run directive mcp serve`
-   - Working directory: your repo root (where `directive/` lives)
-3. Save settings and open an AI chat in the same workspace. The agent should auto-discover tools.
-4. Sanity check: ask the agent "Create a new spec". It should use the Spec template bundle it discovers. If it can’t find tools, confirm the server command runs in your shell and `uv` is on PATH.
+2. Commit a workspace‑local MCP config so Cursor auto‑starts the server in this repo:
+   - Create `.cursor/mcp.json` at the repo root with:
+
+```
+{
+  "mcpServers": {
+    "Directive": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["run", "directive", "mcp", "serve"]
+    }
+  }
+}
+```
+
+3. Commit the file (`git add .cursor/mcp.json && git commit -m "docs: add Cursor MCP config"`).
+4. Reload Cursor (or Reload Window). Cursor will start/stop the server per workspace automatically.
+5. Sanity check in this workspace:
+   - Open an AI chat and ask: "Create a new spec"
+   - You should see tools discovered and the Spec template bundle used
+6. Troubleshooting:
+   - Ensure `uv` is on your PATH (e.g., `uv --version`)
+   - Confirm the command runs locally: `uv run directive mcp serve` (it is a quiet stdio server)
 
 ## Workflow
 
@@ -40,10 +56,7 @@ Use this flow whenever you ask an agent to write code.
 
 Step 1 — Spec (collaborative, behavior/UX‑only)
 - If your agent supports MCP: ensure the server is configured to run; the agent will fetch AOP, Agent Context, and the Spec template automatically.
-- Or include manually:
-  - `/directive/agent_operating_procedure.md`
-  - `/directive/agent_context.md`
-  - `/directive/templates/spec_template.md`
+- Or include manually: include the single directory `/directive/reference/` in context (it contains AOP, Agent Context, and templates).
 - Copy/paste prompt:
 ```
 Create /directive/specs/<feature>/ (if missing) and scaffold /directive/specs/<feature>/spec.md from the Spec template. Collaborate with me to draft the Spec: behavior/UX only, clear acceptance criteria, and include UX links. Ask questions until unambiguous.
@@ -51,11 +64,7 @@ Create /directive/specs/<feature>/ (if missing) and scaffold /directive/specs/<f
 
 Step 2 — Impact Analysis (approve before TDR)
 - If your agent supports MCP: ensure the server is configured to run; the agent will fetch AOP, Agent Context, and the Impact template automatically (include your authored Spec as well).
-- Or include manually:
-  - `/directive/specs/<feature>/spec.md`
-  - `/directive/agent_operating_procedure.md`
-  - `/directive/agent_context.md`
-  - `/directive/templates/impact_template.md`
+- Or include manually: include the single directory `/directive/reference/` plus your authored Spec (`/directive/specs/<feature>/spec.md`).
 - Copy/paste prompt:
 ```
 Produce /directive/specs/<feature>/impact.md using the Impact template. Call out touched modules, contract changes (APIs/events/schemas/migrations), risks, and observability needs. Keep it concise and actionable.
@@ -63,12 +72,7 @@ Produce /directive/specs/<feature>/impact.md using the Impact template. Call out
 
 Step 3 — Technical Design Review (TDR) (approve before coding)
 - If your agent supports MCP: ensure the server is configured to run; the agent will fetch AOP, Agent Context, and the TDR template automatically (include your authored Spec and Impact as well).
-- Or include manually:
-  - `/directive/specs/<feature>/spec.md`
-  - `/directive/specs/<feature>/impact.md`
-  - `/directive/agent_operating_procedure.md`
-  - `/directive/agent_context.md`
-  - `/directive/templates/tdr_template.md`
+- Or include manually: include the single directory `/directive/reference/` plus your authored Spec and Impact.
 - Copy/paste prompt:
 ```
 Draft /directive/specs/<feature>/tdr.md using the TDR template. Be decisive about interfaces and behavior. Include Codebase Map (brief), data contracts, error handling, observability, rollout, and Spec→Test mapping. Wait for my approval before coding.
@@ -90,12 +94,13 @@ Gates: Spec → Impact → TDR → TDD (no code before TDR approval).
 spec-first-agent-kit/
 ├─ README.md
 ├─ directive/
-│  ├─ agent_context.md                     # persistent stack, TDD rules, conventions
-│  ├─ agent_operating_procedure.md         # step-by-step workflow (AOP)
-│  ├─ templates/
-│  │  ├─ spec_template.md
-│  │  ├─ impact_template.md
-│  │  └─ tdr_template.md
+│  ├─ reference/
+│  │  ├─ agent_context.md                     # persistent stack, TDD rules, conventions
+│  │  ├─ agent_operating_procedure.md         # step-by-step workflow (AOP)
+│  │  ├─ templates/
+│  │  │  ├─ spec_template.md
+│  │  │  ├─ impact_template.md
+│  │  │  └─ tdr_template.md
 │  └─ specs/
 │     └─ examples/
 │        └─ reset-password/
