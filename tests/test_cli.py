@@ -14,9 +14,9 @@ def test_cli_init_and_bundle_outputs_json(tmp_path: Path, monkeypatch):
     res = _run_cli(["init"], tmp_path)
     assert res.returncode == 0
     # Ensure files created
-    assert (tmp_path / "directive" / "agent_operating_procedure.md").exists()
-    assert (tmp_path / "directive" / "agent_context.md").exists()
-    assert (tmp_path / "directive" / "templates" / "spec_template.md").exists()
+    assert (tmp_path / "directive" / "reference" / "agent_operating_procedure.md").exists()
+    assert (tmp_path / "directive" / "reference" / "agent_context.md").exists()
+    assert (tmp_path / "directive" / "reference" / "templates" / "spec_template.md").exists()
 
     # Now run bundle and parse JSON
     res2 = _run_cli(["bundle", "spec_template.md"], tmp_path)

@@ -56,3 +56,4 @@ Attach this file + the feature spec to the agent for every build.
 - Commit order per task: `test:` → `feat:` → `refactor:`  
 - CI blocks merge unless all tests pass  
 
+

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "Directive": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["run", "directive", "mcp", "serve"]
+    }
+  }
+}
+
+

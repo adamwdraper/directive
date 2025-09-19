@@ -64,17 +64,17 @@ def _derive_primer(aop_text: str) -> str:
 
 def build_template_bundle(template_name: str, repo_root: Path | None = None) -> Dict:
     root = get_directive_root(repo_root)
-    aop_path = root / "agent_operating_procedure.md"
-    ctx_path = root / "agent_context.md"
-    tmpl_path = root / "templates" / template_name
+    aop_path = root / "reference" / "agent_operating_procedure.md"
+    ctx_path = root / "reference" / "agent_context.md"
+    tmpl_path = root / "reference" / "templates" / template_name
 
     if not aop_path.exists():
-        raise FileNotFoundError("Missing directive/agent_operating_procedure.md. Run 'directive update'.")
+        raise FileNotFoundError("Missing directive/reference/agent_operating_procedure.md. Run 'directive update'.")
     if not ctx_path.exists():
-        raise FileNotFoundError("Missing directive/agent_context.md. Run 'directive update'.")
+        raise FileNotFoundError("Missing directive/reference/agent_context.md. Run 'directive update'.")
     if not tmpl_path.exists():
         raise FileNotFoundError(
-            f"Missing template: directive/templates/{template_name}. Run 'directive update' or choose an existing template."
+            f"Missing template: directive/reference/templates/{template_name}. Run 'directive update' or choose an existing template."
         )
 
     aop = aop_path.read_text(encoding="utf-8")
@@ -85,13 +85,13 @@ def build_template_bundle(template_name: str, repo_root: Path | None = None) -> 
 
     return {
         "primer": primer,
-        "agentOperatingProcedure": {"path": "directive/agent_operating_procedure.md", "content": aop},
-        "agentContext": {"path": "directive/agent_context.md", "content": ctx},
-        "template": {"path": f"directive/templates/{template_name}", "content": tmpl},
+        "agentOperatingProcedure": {"path": "directive/reference/agent_operating_procedure.md", "content": aop},
+        "agentContext": {"path": "directive/reference/agent_context.md", "content": ctx},
+        "template": {"path": f"directive/reference/templates/{template_name}", "content": tmpl},
         "resources": [
-            {"path": "directive/agent_operating_procedure.md"},
-            {"path": "directive/agent_context.md"},
-            {"path": f"directive/templates/{template_name}"},
+            {"path": "directive/reference/agent_operating_procedure.md"},
+            {"path": "directive/reference/agent_context.md"},
+            {"path": f"directive/reference/templates/{template_name}"},
         ],
     }
 
