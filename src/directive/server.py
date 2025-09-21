@@ -1,3 +1,8 @@
+#!/usr/bin/env -S uv run -q
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["mcp>=1.2.0"]
+# ///
 from __future__ import annotations
 
 import json
@@ -5,12 +10,28 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from .bundles import build_template_bundle, list_directive_files, read_directive_file, get_directive_root
+import sys as _sys
+from pathlib import Path as _Path
+
+# Ensure local src/ is importable when running as a script via uv run
+_SRC_CANDIDATE = _Path(__file__).resolve().parents[2] / "src"
+if _SRC_CANDIDATE.exists() and str(_SRC_CANDIDATE) not in _sys.path:
+    _sys.path.insert(0, str(_SRC_CANDIDATE))
+
+from directive.bundles import build_template_bundle, list_directive_files, read_directive_file, get_directive_root
+try:
+    # Prefer official MCP server when launched as a script (Cursor)
+    from mcp.server.fastmcp import FastMCP  # type: ignore
+except Exception:  # pragma: no cover
+    FastMCP = None  # type: ignore
+try:  # Python 3.8+
+    from importlib.metadata import version as _pkg_version  # type: ignore
+except Exception:  # pragma: no cover
+    _pkg_version = None  # type: ignore
 
 
-# Minimal stdio JSON-RPC server shape tailored for MCP-like usage.
-# This is a lightweight scaffold; if the official MCP Python library is available
-# later, this module can be adapted to use it without changing higher-level logic.
+# Minimal stdio JSON-RPC server (legacy) and FastMCP app (preferred for Cursor).
+# Legacy server remains for tests; FastMCP path is used when running this file as a script.
 
 
 @dataclass
@@ -23,18 +44,31 @@ class Request:
 def _read_message() -> Optional[Dict[str, Any]]:
     import sys
 
-    header = sys.stdin.readline()
-    if not header:
-        return None
-    header = header.strip()
-    if not header.lower().startswith("content-length:"):
+    # Read headers until blank line; accept multiple headers and case-insensitive names.
+    headers: Dict[str, str] = {}
+    while True:
+        line = sys.stdin.readline()
+        if not line:
+            return None
+        if line in ("\r\n", "\n", ""):
+            break
+        if ":" not in line:
+            # Ignore malformed header lines rather than failing hard
+            continue
+        name, value = line.split(":", 1)
+        headers[name.strip().lower()] = value.strip()
+
+    length_str = headers.get("content-length")
+    if not length_str:
         return None
     try:
-        length = int(header.split(":", 1)[1].strip())
+        length = int(length_str)
     except Exception:
         return None
-    # Read empty line
-    sys.stdin.readline()
+    # Basic safety cap (10 MB) to avoid excessive memory usage
+    if length < 0 or length > 10 * 1024 * 1024:
+        return None
+
     raw = sys.stdin.read(length)
     if not raw:
         return None
@@ -45,7 +79,9 @@ def _write_message(payload: Dict[str, Any]) -> None:
     import sys
 
     data = json.dumps(payload)
-    sys.stdout.write(f"Content-Length: {len(data)}\r\n\r\n{data}")
+    sys.stdout.write(
+        f"Content-Length: {len(data)}\r\nContent-Type: application/json\r\n\r\n{data}"
+    )
     sys.stdout.flush()
 
 
@@ -128,8 +164,24 @@ def serve_stdio(root: Path) -> int:
         params = msg.get("params") or {}
 
         try:
+            # MCP initialize: declare capabilities so clients know tools are available
+            if method == "initialize":
+                ver = "0.0.0"
+                try:
+                    if _pkg_version is not None:
+                        ver = _pkg_version("directive")  # type: ignore
+                except Exception:
+                    pass
+                _result(
+                    id_value,
+                    {
+                        "capabilities": {"tools": {}},
+                        "serverInfo": {"name": "directive", "version": ver},
+                    },
+                )
+
             # MCP tool discovery
-            if method == "tools/list":
+            elif method == "tools/list":
                 _result(id_value, {"tools": _tool_descriptors()})
 
             # MCP tool execution
@@ -190,5 +242,48 @@ def serve_stdio(root: Path) -> int:
             _error(id_value, -32000, "Server error", {"details": str(e)})
 
     return 0
+
+
+# ---- FastMCP (preferred runtime in Cursor) ----
+def _build_fastmcp_app() -> Any:
+    if FastMCP is None:
+        return None
+    app = FastMCP("directive")
+
+    @app.tool(name="directive/files.list")
+    def directive_files_list() -> str:  # type: ignore
+        files = list_directive_files(Path.cwd())
+        return json.dumps({"files": files})
+
+    @app.tool(name="directive/file.get")
+    def directive_file_get(path: str) -> str:  # type: ignore
+        content = read_directive_file(Path.cwd(), path)
+        return json.dumps({"path": path, "content": content})
+
+    @app.tool(name="directive/spec.template")
+    def directive_spec_template() -> str:  # type: ignore
+        bundle = build_template_bundle("spec_template.md", Path.cwd())
+        return json.dumps(bundle)
+
+    @app.tool(name="directive/impact.template")
+    def directive_impact_template() -> str:  # type: ignore
+        bundle = build_template_bundle("impact_template.md", Path.cwd())
+        return json.dumps(bundle)
+
+    @app.tool(name="directive/tdr.template")
+    def directive_tdr_template() -> str:  # type: ignore
+        bundle = build_template_bundle("tdr_template.md", Path.cwd())
+        return json.dumps(bundle)
+
+    return app
+
+
+if __name__ == "__main__":  # pragma: no cover
+    app = _build_fastmcp_app()
+    if app is None:
+        # Fallback to legacy server (should not happen in Cursor execution)
+        serve_stdio(root=Path.cwd().joinpath("directive"))
+    else:
+        app.run("stdio")
 
 

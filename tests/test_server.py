@@ -103,3 +103,50 @@ def test_tools_call_file_get_and_list(tmp_path: Path):
     assert "directive/reference/agent_context.md" in payload2.get("files", [])
 
 
+def _run_server_once_with_headers(cwd: Path, request: dict, extra_headers: list[tuple[str, str]]) -> dict:
+    # Launch the server and send a single JSON-RPC request over stdio with extra headers
+    proc = subprocess.Popen(
+        [sys.executable, "-c", "from directive.server import serve_stdio; import sys, json; serve_stdio(__import__('pathlib').Path.cwd().joinpath('directive'))"],
+        cwd=str(cwd),
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    payload = json.dumps({"jsonrpc": "2.0", "id": 1, **request})
+    headers = "".join([f"{k}: {v}\r\n" for k, v in extra_headers]) + f"Content-Length: {len(payload)}\r\n\r\n"
+    out, err = proc.communicate(input=f"{headers}{payload}", timeout=5)
+    assert err == "" or err is not None
+    assert out.startswith("Content-Length:")
+    if "\r\n\r\n" in out:
+        header, body = out.split("\r\n\r\n", 1)
+    else:
+        header, body = out.split("\n\n", 1)
+    return json.loads(body)
+
+
+def test_initialize_capabilities(tmp_path: Path):
+    resp = _run_server_once(tmp_path, {"method": "initialize", "params": {}})
+    assert resp.get("id") == 1
+    caps = resp.get("result", {}).get("capabilities", {})
+    assert "tools" in caps
+
+
+def test_header_parsing_accepts_multiple_headers(tmp_path: Path):
+    # Ensure header parsing accepts additional headers before Content-Length
+    resp = _run_server_once_with_headers(
+        tmp_path,
+        {"method": "tools/list", "params": {}},
+        [("Content-Type", "application/json"), ("X-Dummy", "1")],
+    )
+    assert resp.get("id") == 1
+    tools = resp.get("result", {}).get("tools", [])
+    names = {t.get("name") for t in tools}
+    assert {
+        "directive/files.list",
+        "directive/file.get",
+        "directive/spec.template",
+        "directive/impact.template",
+        "directive/tdr.template",
+    }.issubset(names)
+

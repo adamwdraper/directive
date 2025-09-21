@@ -2,10 +2,9 @@
   "mcpServers": {
     "Directive": {
       "type": "stdio",
-      "command": "uv",
-      "args": ["run", "directive", "mcp", "serve"]
+      "command": "/usr/bin/env",
+      "args": ["-S", "uv", "run", "-q", "-m", "directive.cli", "mcp", "serve"],
+      "transport": "stdio"
     }
   }
 }
-
-
