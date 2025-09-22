@@ -50,6 +50,91 @@ def _copy_tree(src: Path, dst: Path, overwrite: bool = False) -> Tuple[int, int,
     return copied, skipped, notes
 
 
+def _ensure_cursor_launcher(repo_root: Path, overwrite: bool = False) -> Tuple[int, int, List[str]]:
+    """Create a repo-local launcher script and mcp.json for Cursor.
+
+    Files:
+      - .cursor/servers/directive.sh
+      - .cursor/mcp.json
+
+    Returns: (created_count, skipped_count, notes)
+    """
+    created = 0
+    skipped = 0
+    notes: List[str] = []
+
+    cursor_dir = repo_root.joinpath(".cursor")
+    servers_dir = cursor_dir.joinpath("servers")
+    servers_dir.mkdir(parents=True, exist_ok=True)
+
+    # Launcher script
+    launcher_path = servers_dir.joinpath("directive.sh")
+    launcher_body = """#!/usr/bin/env bash
+set -euo pipefail
+# cd to repo root; fall back to script-relative root
+if ROOT=$(git rev-parse --show-toplevel 2>/dev/null); then
+  cd "$ROOT"
+else
+  ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+  cd "$ROOT"
+fi
+
+# Development: prefer local source via uv run (fast with cache) or system Python fallback
+if [ -d "$ROOT/src/directive" ]; then
+  export PYTHONUNBUFFERED=1
+  export PYTHONPATH="${ROOT}/src${PYTHONPATH+:$PYTHONPATH}"
+  if command -v uv >/dev/null 2>&1; then
+    exec uv run python -u -m directive.cli mcp serve
+  else
+    exec python3 -u -m directive.cli mcp serve
+  fi
+fi
+
+# Installed: console script on PATH
+if command -v directive >/dev/null 2>&1; then
+  exec directive mcp serve
+fi
+
+echo "directive launcher not found. Install with: pipx install directive, or develop locally with src/ present." >&2
+exit 127
+"""
+    if launcher_path.exists() and not overwrite:
+        skipped += 1
+        notes.append(f"skip existing: {launcher_path}")
+    else:
+        launcher_path.write_text(launcher_body, encoding="utf-8")
+        try:
+            # Make executable on POSIX
+            os.chmod(launcher_path, 0o755)  # type: ignore[attr-defined]
+        except Exception:
+            pass
+        created += 1
+        notes.append(f"wrote: {launcher_path}")
+
+    # mcp.json
+    mcp_path = cursor_dir.joinpath("mcp.json")
+    mcp_obj: Dict[str, Dict] = {
+        "mcpServers": {
+            "Directive": {
+                "type": "stdio",
+                "command": "/usr/bin/env",
+                "args": ["-S", "uv", "run", "--python", "3.13", "-q", "-m", "directive.cli", "mcp", "serve"],
+                "transport": "stdio",
+            }
+        }
+    }
+    mcp_body = json.dumps(mcp_obj, indent=2)
+    if mcp_path.exists() and not overwrite:
+        skipped += 1
+        notes.append(f"skip existing: {mcp_path}")
+    else:
+        mcp_path.write_text(mcp_body + "\n", encoding="utf-8")
+        created += 1
+        notes.append(f"wrote: {mcp_path}")
+
+    return created, skipped, notes
+
+
 def cmd_init(args: argparse.Namespace) -> int:
     repo_root = Path.cwd()
     target = repo_root.joinpath("directive")
@@ -60,6 +145,12 @@ def cmd_init(args: argparse.Namespace) -> int:
     _print(f"Initialized directive/ (copied {copied}, skipped {skipped})")
     if args.verbose:
         for n in notes:
+            _print(n)
+    # Ensure Cursor launcher and mcp.json
+    c_created, c_skipped, c_notes = _ensure_cursor_launcher(repo_root, overwrite=False)
+    _print(f"Prepared .cursor/ (created {c_created}, skipped {c_skipped})")
+    if args.verbose:
+        for n in c_notes:
             _print(n)
     return 0
 
@@ -76,19 +167,29 @@ def cmd_update(args: argparse.Namespace) -> int:
     if args.verbose:
         for n in notes:
             _print(n)
+    # Refresh Cursor launcher and mcp.json to latest template
+    c_created, c_skipped, c_notes = _ensure_cursor_launcher(repo_root, overwrite=True)
+    _print(f"Updated .cursor/ (created {c_created}, overwrote {c_skipped})")
+    if args.verbose:
+        for n in c_notes:
+            _print(n)
     return 0
 
 
 def cmd_mcp_serve(args: argparse.Namespace) -> int:
     try:
-        from .server import serve_stdio
-    except Exception as exc:  # ImportError or others
-        _err("MCP server could not start due to missing or incompatible dependencies for directive's server.")
-        _err("Ensure this package is installed correctly and try again (e.g., 'uv pip install -e .').")
-        _err(f"Details: {exc}")
+        # Prefer FastMCP app when available
+        from .server import _build_fastmcp_app, serve_stdio  # type: ignore
+        app = _build_fastmcp_app()
+        if app is not None:
+            app.run("stdio")
+            return 0
+        # Fallback to legacy stdio server
+        return serve_stdio(root=Path.cwd().joinpath("directive"))
+    except Exception as exc:  # pragma: no cover
+        _err("Failed to start Directive MCP server.")
+        _err(str(exc))
         return 1
-
-    return serve_stdio(root=Path.cwd().joinpath("directive"))
 
 
 def cmd_bundle(args: argparse.Namespace) -> int:

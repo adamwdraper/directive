@@ -50,18 +50,6 @@ def read_directive_file(repo_root: Path | None, path: str) -> str:
     return full.read_text(encoding="utf-8")
 
 
-def _derive_primer(aop_text: str) -> str:
-    # Try to extract a concise guidance line from AOP
-    for line in aop_text.splitlines():
-        line_stripped = line.strip()
-        if not line_stripped:
-            continue
-        if "Do not write code" in line_stripped or "Do not start coding" in line_stripped:
-            return line_stripped.replace("**", "")
-    # Fallback concise primer
-    return "Do not write code before TDR approval. Follow Spec → Impact → TDR → TDD."
-
-
 def build_template_bundle(template_name: str, repo_root: Path | None = None) -> Dict:
     root = get_directive_root(repo_root)
     aop_path = root / "reference" / "agent_operating_procedure.md"
@@ -81,10 +69,7 @@ def build_template_bundle(template_name: str, repo_root: Path | None = None) -> 
     ctx = ctx_path.read_text(encoding="utf-8")
     tmpl = tmpl_path.read_text(encoding="utf-8")
 
-    primer = _derive_primer(aop)
-
     return {
-        "primer": primer,
         "agentOperatingProcedure": {"path": "directive/reference/agent_operating_procedure.md", "content": aop},
         "agentContext": {"path": "directive/reference/agent_context.md", "content": ctx},
         "template": {"path": f"directive/reference/templates/{template_name}", "content": tmpl},

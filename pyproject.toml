@@ -4,10 +4,10 @@ build-backend = "hatchling.build"
 
 [project]
 name = "directive"
-version = "0.0.1"
+version = "0.0.2"
 description = "Directive CLI and MCP server scaffolding for file-driven agent context."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 license = { file = "LICENSE" }
 authors = [
   { name = "Adam Draper" }
@@ -19,7 +19,9 @@ classifiers = [
 ]
 keywords = ["directive", "mcp", "cli", "agent", "templates"]
 
-dependencies = []
+dependencies = [
+  "mcp>=1.14.1",
+]
 
 [project.optional-dependencies]
 test = [

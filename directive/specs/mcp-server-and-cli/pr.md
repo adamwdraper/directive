@@ -16,7 +16,7 @@ Implements a minimal, read-only MCP server and a tiny `directive` CLI to make th
   - `bundle <template>`: print a read-only drafting bundle (AOP + Agent Context + template + Primer)
 - Packaged defaults under `src/directive/data/directive/` (AOP + templates) and wired into CLI init/update
 - Bundles API (`directive.bundles`) returning:
-  - `primer`, `agentOperatingProcedure`, `agentContext`, `template`, `resources`
+  - `agentOperatingProcedure`, `agentContext`, `template`, `resources`
 - Minimal stdio server exposing MCP-like surface:
   - `directive.files.list`
   - `directive.file.get`
