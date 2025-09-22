@@ -1,7 +1,15 @@
 # Directive: Spec‑first approach to working with AI coding agents
 
-A lightweight, implementation‑agnostic workflow for building software with AI coding agents.  
-It separates **product intent** (Spec) from **engineering constraints** (Agent Context) and enforces an **analyze → design → TDD** loop.
+Write specs, not chats.
+
+A spec‑first approach to increase coding agent accuracy and developer efficiency. It replaces ad‑hoc back‑and‑forth with concise, versioned specs that become the canonical history of your work.
+
+Problems this aims to solve:
+- **Improving agent accuracy and developer efficiency**: Clear specs reduce ambiguity and rework, speed up iterations, and align expectations between humans and agents.
+- **Replacing chatty back‑and‑forth with upfront, versioned specs**: Author concise specs first to avoid prompt drift; keep a single source of truth that onboards collaborators quickly.
+- **Specs as durable, reviewable artifacts and canonical history**: Spec → Impact → TDR live in the repo, capturing decisions and enabling traceability; Spec→Test mapping turns requirements into verification.
+
+How it works (brief): Work is gated by explicit review checkpoints — **Spec → Impact → TDR** — with no code before approval. After approval, follow strict TDD with Spec→Test mapping. Everything lives in‑repo and is exposed via a tiny MCP server for IDEs like Cursor. See the supporting background in [Research & Rationale](#research--rationale).
 
 ## Quickstart (CLI + MCP)
 
@@ -26,16 +34,18 @@ It separates **product intent** (Spec) from **engineering constraints** (Agent C
 1. Ensure your project has Directive installed and initialized:
    - `uv add directive`
    - `uv run directive init`
-2. Commit a workspace‑local MCP config so Cursor auto‑starts the server in this repo:
-   - Create `.cursor/mcp.json` at the repo root with:
+2. MCP config for Cursor (auto‑created by `directive init` if missing):
+   - `uv run directive init` will create `.cursor/mcp.json` and `.cursor/servers/directive.sh` if they don't exist.
+   - If you already have `.cursor/mcp.json`, copy/merge the following JSON into your existing file:
 
 ```
 {
   "mcpServers": {
     "Directive": {
       "type": "stdio",
-      "command": "uv",
-      "args": ["run", "directive", "mcp", "serve"]
+      "command": "/usr/bin/env",
+      "args": ["-S", "uv", "run", "-q", "-m", "directive.cli", "mcp", "serve"],
+      "transport": "stdio"
     }
   }
 }
@@ -88,29 +98,6 @@ Implement via TDD: write a failing test per Spec acceptance criterion (mapped in
 ```
 
 Gates: Spec → Impact → TDR → TDD (no code before TDR approval).
-
-## Repository Layout
-```
-spec-first-agent-kit/
-├─ README.md
-├─ directive/
-│  ├─ reference/
-│  │  ├─ agent_context.md                     # persistent stack, TDD rules, conventions
-│  │  ├─ agent_operating_procedure.md         # step-by-step workflow (AOP)
-│  │  ├─ templates/
-│  │  │  ├─ spec_template.md
-│  │  │  ├─ impact_template.md
-│  │  │  └─ tdr_template.md
-│  └─ specs/
-│     └─ examples/
-│        └─ reset-password/
-│           ├─ spec.md
-│           ├─ impact.md
-│           └─ tdr.md
-└─ .github/
-   └─ pull_request_template.md             # reviewer checklist
-```
-
  
 ## Research & Rationale
 
