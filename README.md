@@ -55,7 +55,7 @@ How it works (brief): Work is gated by explicit review checkpoints — **Spec �
 
 ## Workflow
 
-You can use the MCP server (auto-discovers templates and context), or do it manually by including the single directory `/directive/reference/` in context (contains `agent_operating_procedure.md`, `agent_context.md`, and templates).
+You can use the MCP server (auto-discovers templates and context), or do it manually by including the single directory `/directive/reference/` in context (contains `agent_operating_procedure.md`, `agent_context.md`, and templates). Customize `/directive/reference/agent_context.md` for your project (languages, tooling, conventions) and keep it up to date; follow the guidance in `agent_operating_procedure.md` for the flow.
 
 Step 1 — Spec (behavior/UX‑only)
 - Define desired behavior, interfaces, user outcomes, and clear acceptance criteria. Save as `/directive/specs/<feature>/spec.md` (template: `/directive/reference/templates/spec_template.md`).
@@ -66,8 +66,8 @@ Step 2 — Impact Analysis (approve before TDR)
 Step 3 — Technical Design Review (TDR) (approve before coding)
 - Decide interfaces and behavior. Include a brief Codebase Map, data contracts, error handling, observability, rollout, and Spec→Test mapping. Save as `/directive/specs/<feature>/tdr.md` (template: `/directive/reference/templates/tdr_template.md`).
 
-Step 4 — Coding via TDD (after TDR approval)
-- For each acceptance criterion: write a failing test, confirm failure, implement the minimal change, then refactor. Keep CI green.
+Step 4 — Start implementation (after TDR approval)
+- Begin coding guided by the TDR and your `agent_context.md`. Use tests to validate behavior and keep CI green.
 
 Gates: Spec → Impact → TDR → TDD (no code before TDR approval).
  
