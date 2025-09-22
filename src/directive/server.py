@@ -107,7 +107,7 @@ def _tool_descriptors() -> List[Dict[str, Any]]:
             "inputSchema": {"type": "object", "additionalProperties": False, "properties": {}},
         },
         {
-            "name": "directive/file.get",
+            "name": "directive/files.get",
             "title": "Read Directive File",
             "description": "Read a file under directive/ by path and return its full contents verbatim.",
             "inputSchema": {
@@ -123,19 +123,19 @@ def _tool_descriptors() -> List[Dict[str, Any]]:
             },
         },
         {
-            "name": "directive/spec.template",
+            "name": "directive/templates.spec",
             "title": "Spec Template Bundle",
             "description": "Return Agent Operating Procedure, Agent Context, and the Spec template, plus a concise Primer for drafting a new Spec.",
             "inputSchema": {"type": "object", "additionalProperties": False, "properties": {}},
         },
         {
-            "name": "directive/impact.template",
+            "name": "directive/templates.impact",
             "title": "Impact Template Bundle",
             "description": "Return Agent Operating Procedure, Agent Context, and the Impact template, plus a concise Primer for drafting an Impact analysis.",
             "inputSchema": {"type": "object", "additionalProperties": False, "properties": {}},
         },
         {
-            "name": "directive/tdr.template",
+            "name": "directive/templates.tdr",
             "title": "TDR Template Bundle",
             "description": "Return Agent Operating Procedure, Agent Context, and the TDR template, plus a concise Primer for drafting a Technical Design Review.",
             "inputSchema": {"type": "object", "additionalProperties": False, "properties": {}},
@@ -196,44 +196,29 @@ def serve_stdio(root: Path) -> int:
                     files = list_directive_files(repo_root)
                     _result(id_value, _wrap_text_content(json.dumps({"files": files})))
 
-                elif name == "directive/file.get":
+                elif name == "directive/files.get":
                     path = arguments.get("path")
                     if not isinstance(path, str):
                         raise ValueError("path must be a string")
                     content = read_directive_file(repo_root, path)
                     _result(id_value, _wrap_text_content(json.dumps({"path": path, "content": content})))
 
-                elif name == "directive/spec.template":
+                elif name == "directive/templates.spec":
                     bundle = build_template_bundle("spec_template.md", repo_root)
                     _result(id_value, _wrap_text_content(json.dumps(bundle)))
 
-                elif name == "directive/impact.template":
+                elif name == "directive/templates.impact":
                     bundle = build_template_bundle("impact_template.md", repo_root)
                     _result(id_value, _wrap_text_content(json.dumps(bundle)))
 
-                elif name == "directive/tdr.template":
+                elif name == "directive/templates.tdr":
                     bundle = build_template_bundle("tdr_template.md", repo_root)
                     _result(id_value, _wrap_text_content(json.dumps(bundle)))
 
                 else:
                     _error(id_value, -32601, f"Tool not found: {name}")
 
-            # Back-compat custom methods
-            elif method == "directive.files.list":
-                files = list_directive_files(repo_root)
-                _result(id_value, {"files": files})
-            elif method == "directive.file.get":
-                path = params.get("path")
-                if not isinstance(path, str):
-                    raise ValueError("path must be a string")
-                content = read_directive_file(repo_root, path)
-                _result(id_value, {"path": path, "content": content})
-            elif method == "spec.template":
-                _result(id_value, build_template_bundle("spec_template.md", repo_root))
-            elif method == "impact.template":
-                _result(id_value, build_template_bundle("impact_template.md", repo_root))
-            elif method == "tdr.template":
-                _result(id_value, build_template_bundle("tdr_template.md", repo_root))
+            # Back-compat custom methods removed per new naming convention
             else:
                 _error(id_value, -32601, f"Method not found: {method}")
         except FileNotFoundError as e:
@@ -255,22 +240,22 @@ def _build_fastmcp_app() -> Any:
         files = list_directive_files(Path.cwd())
         return json.dumps({"files": files})
 
-    @app.tool(name="directive/file.get")
+    @app.tool(name="directive/files.get")
     def directive_file_get(path: str) -> str:  # type: ignore
         content = read_directive_file(Path.cwd(), path)
         return json.dumps({"path": path, "content": content})
 
-    @app.tool(name="directive/spec.template")
+    @app.tool(name="directive/templates.spec")
     def directive_spec_template() -> str:  # type: ignore
         bundle = build_template_bundle("spec_template.md", Path.cwd())
         return json.dumps(bundle)
 
-    @app.tool(name="directive/impact.template")
+    @app.tool(name="directive/templates.impact")
     def directive_impact_template() -> str:  # type: ignore
         bundle = build_template_bundle("impact_template.md", Path.cwd())
         return json.dumps(bundle)
 
-    @app.tool(name="directive/tdr.template")
+    @app.tool(name="directive/templates.tdr")
     def directive_tdr_template() -> str:  # type: ignore
         bundle = build_template_bundle("tdr_template.md", Path.cwd())
         return json.dumps(bundle)

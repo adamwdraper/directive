@@ -16,10 +16,10 @@ It separates **product intent** (Spec) from **engineering constraints** (Agent C
   - `uv run directive bundle spec_template.md` (prints a JSON bundle to stdout)
 
 ### Exposed tools (discovered automatically)
-- `directive/spec.template`: Spec bundle (AOP, Agent Context, Spec template, Primer)
-- `directive/impact.template`: Impact bundle
-- `directive/tdr.template`: TDR bundle
-- `directive/file.get`: Read a file under `directive/` by path
+- `directive/templates.spec`: Spec bundle (AOP, Agent Context, Spec template, Primer)
+- `directive/templates.impact`: Impact bundle
+- `directive/templates.tdr`: TDR bundle
+- `directive/files.get`: Read a file under `directive/` by path
 - `directive/files.list`: List files under `directive/`
 
 ### Using with Cursor (MCP)
