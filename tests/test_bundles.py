@@ -29,7 +29,6 @@ def test_build_template_bundle_happy_path(tmp_path: Path, monkeypatch):
     monkeypatch.chdir(tmp_path)
 
     bundle = build_template_bundle("spec_template.md")
-    assert bundle["primer"].lower().startswith("do not write code")
     assert bundle["agentOperatingProcedure"]["path"] == "directive/reference/agent_operating_procedure.md"
     assert bundle["agentContext"]["path"] == "directive/reference/agent_context.md"
     assert bundle["template"]["path"].endswith("spec_template.md")

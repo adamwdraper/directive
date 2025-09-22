@@ -55,7 +55,7 @@ Edge case (template missing):
 - Given `directive/reference/templates/spec_template.md` is present, when the agent calls `spec.template()`, then the returned template content matches the on‑disk file verbatim (no summarization).  
 - Given `directive/reference/templates/impact_template.md` is present, when the agent calls `impact.template()`, then the returned template content matches the on‑disk file verbatim (no summarization).  
 - Given `directive/reference/templates/tdr_template.md` is present, when the agent calls `tdr.template()`, then the returned template content matches the on‑disk file verbatim (no summarization).  
-- Given an agent requests a bundle, then the response includes a `primer` string with concise AOP guidance alongside the full AOP, Agent Context, and template contents.  
+  
 - Given a feature spec folder already exists, when the agent requests a bundle for the same feature, then the tool returns the same full docs and template without attempting any writes, and may include a helpful note that the spec path already exists.  
 - Given the template file is missing, when the agent requests a bundle, then the tool returns a helpful error listing available templates and suggests running the CLI `update` to restore defaults.  
 - Given the MCP server is running, when an agent queries available resources, then it can list and fetch files under `directive/` (context and templates).  

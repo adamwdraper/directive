@@ -32,7 +32,7 @@ MCP Resources
 
 MCP Tools (read‑only templates)
 - `spec.template()` → returns object:
-  - `primer: string` (concise AOP guidance)
+  
   - `agentOperatingProcedure: { path, content }`
   - `agentContext: { path, content }`
   - `template: { path: "directive/templates/spec_template.md", content }`
@@ -61,7 +61,6 @@ Performance expectations
 MCP responses (illustrative JSON for `spec.template()`)
 ```
 {
-  "primer": "Do not write code before TDR approval. Follow Spec → Impact → TDR → TDD.",
   "agentOperatingProcedure": { "path": "directive/agent_operating_procedure.md", "content": "...full text..." },
   "agentContext": { "path": "directive/agent_context.md", "content": "...full text..." },
   "template": { "path": "directive/templates/spec_template.md", "content": "...full text..." },
