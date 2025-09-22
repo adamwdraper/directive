@@ -57,19 +57,22 @@ How it works (brief): Work is gated by explicit review checkpoints — **Spec �
 
 You can use the MCP server (auto-discovers templates and context), or do it manually by including the single directory `/directive/reference/` in context (contains `agent_operating_procedure.md`, `agent_context.md`, and templates). Customize `/directive/reference/agent_context.md` for your project (languages, tooling, conventions) and keep it up to date; follow the guidance in `agent_operating_procedure.md` for the flow.
 
-Step 1 — Spec (behavior/UX‑only)
+Step 1 — Customize Agent Context
+- Tailor `/directive/reference/agent_context.md` to your project (languages, tooling, conventions, security, testing). Refer to `agent_operating_procedure.md` for the end‑to‑end flow.
+
+Step 2 — Spec (behavior/UX‑only)
 - Define desired behavior, interfaces, user outcomes, and clear acceptance criteria. Save as `/directive/specs/<feature>/spec.md` (template: `/directive/reference/templates/spec_template.md`).
 
-Step 2 — Impact Analysis (approve before TDR)
+Step 3 — Impact Analysis (approve before TDR)
 - Identify modules/packages touched, contract changes (APIs/events/schemas/migrations), risks, and observability needs. Save as `/directive/specs/<feature>/impact.md` (template: `/directive/reference/templates/impact_template.md`).
 
-Step 3 — Technical Design Review (TDR) (approve before coding)
+Step 4 — Technical Design Review (TDR) (approve before coding)
 - Decide interfaces and behavior. Include a brief Codebase Map, data contracts, error handling, observability, rollout, and Spec→Test mapping. Save as `/directive/specs/<feature>/tdr.md` (template: `/directive/reference/templates/tdr_template.md`).
 
-Step 4 — Start implementation (after TDR approval)
+Step 5 — Start implementation (after TDR approval)
 - Begin coding guided by the TDR and your `agent_context.md`. Use tests to validate behavior and keep CI green.
 
-Gates: Spec → Impact → TDR → TDD (no code before TDR approval).
+Gates: Spec → Impact → TDR → Implementation (no code before TDR approval).
  
 ## Research & Rationale
 
