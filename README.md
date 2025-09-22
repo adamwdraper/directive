@@ -55,7 +55,8 @@ How it works (brief): Work is gated by explicit review checkpoints — **Spec �
 
 ## Workflow
 
-You can use the MCP server (auto-discovers templates and context), or do it manually by including the single directory `/directive/reference/` in the agent's context (contains `agent_operating_procedure.md`, `agent_context.md`, and templates). The workflow is outlined in `/directive/reference/agent_operating_procedure.md`.
+The Agent Operating Procedure (`/directive/reference/agent_operating_procedure.md`) is a concise, enforceable checklist that defines the Spec → Impact → TDR → Implementation flow and its review gates.
+You can use the MCP server (auto-discovers templates and context), or do it manually by including the single directory `/directive/reference/` in the agent's context (contains `agent_operating_procedure.md`, `agent_context.md`, and templates).
 
 Step 1 — Customize Agent Context
 - Tailor `/directive/reference/agent_context.md` to your project (languages, tooling, conventions, security, testing). Refer to `agent_operating_procedure.md` for the end‑to‑end flow.
