@@ -1,0 +1,84 @@
+name: Release to PyPI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-publish:
+    name: Build and publish if release merge
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check if this commit merged a release branch
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          api_url="https://api.github.com/repos/${REPOSITORY}/commits/${COMMIT_SHA}/pulls"
+          response=$(curl -sS -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "$api_url")
+          export RESPONSE_JSON="$response"
+          python - << 'PY'
+import json, os
+resp_text = os.environ.get('RESPONSE_JSON', '[]')
+try:
+    resp = json.loads(resp_text)
+except Exception:
+    resp = []
+should_release = False
+release_ref = ''
+for pr in resp:
+    base = (pr.get('base') or {}).get('ref')
+    head = (pr.get('head') or {}).get('ref') or ''
+    if base == 'main' and head.startswith('release/'):
+        should_release = True
+        release_ref = head
+        break
+out = open(os.environ['GITHUB_OUTPUT'], 'a')
+out.write(f"should_release={'true' if should_release else 'false'}\n")
+out.write(f"release_ref={release_ref}\n")
+out.close()
+print(f"should_release={should_release} release_ref={release_ref}")
+PY
+
+      - name: Set up Python
+        if: steps.check.outputs.should_release == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install build deps
+        if: steps.check.outputs.should_release == 'true'
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine hatchling
+
+      - name: Build distributions
+        if: steps.check.outputs.should_release == 'true'
+        run: |
+          python -m build
+
+      - name: Twine check
+        if: steps.check.outputs.should_release == 'true'
+        run: |
+          python -m twine check dist/*
+
+      - name: Publish to PyPI
+        if: steps.check.outputs.should_release == 'true'
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          python -m twine upload dist/*
+
+

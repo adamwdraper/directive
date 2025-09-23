@@ -31,6 +31,7 @@ test = [
 
 [project.scripts]
 directive = "directive.cli:main"
+directive-release = "directive.release:main"
 
 [project.urls]
 Homepage = "https://github.com/adamwdraper/directive"
