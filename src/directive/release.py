@@ -96,10 +96,10 @@ def write_new_version(pyproject_path: Path, new_version: str) -> None:
 
 def create_and_push_release_branch(new_version: str) -> None:
     branch_name = f"release/v{new_version}"
+    # Create and switch to new branch BEFORE committing, so base branch stays untouched
+    run_git_command("checkout", "-b", branch_name)
     run_git_command("add", "pyproject.toml")
     run_git_command("commit", "-m", f"chore(release): v{new_version}")
-    # Create and switch to new branch
-    run_git_command("checkout", "-b", branch_name)
     # Push and set upstream
     run_git_command("push", "-u", "origin", branch_name)
     print(f"Pushed {branch_name} to origin")
