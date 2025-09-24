@@ -43,7 +43,7 @@ packages = ["src/directive"]
 
 [tool.hatch.build]
 include = [
-  "src/directive/data/**",
+  "src/directive/**",
 ]
 
 
