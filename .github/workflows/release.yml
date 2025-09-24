@@ -8,6 +8,7 @@ on:
     types: [closed]
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build-and-publish:
@@ -28,6 +29,11 @@ jobs:
           REPOSITORY: ${{ github.repository }}
           COMMIT_SHA: ${{ github.sha }}
         run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "should_release=true" >> "$GITHUB_OUTPUT"
+            echo "release_ref=manual" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             # For PR 'closed' event, we have the head ref directly
             PR_MERGED=${{ github.event.pull_request.merged }}
@@ -43,6 +49,16 @@ jobs:
             fi
           fi
           set -euo pipefail
+          # Heuristic: parse merge commit message for source branch when pushed to main
+          msg=$(git log -1 --pretty=%B)
+          if echo "$msg" | grep -E "from .*/release/" >/dev/null 2>&1; then
+            src=$(echo "$msg" | sed -nE 's/.*from [^/]+\/(release\/[A-Za-z0-9._\-\/]+).*/\1/p' | head -n1)
+            if [ -n "$src" ]; then
+              echo "should_release=true" >> "$GITHUB_OUTPUT"
+              echo "release_ref=$src" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
           api_url="https://api.github.com/repos/${REPOSITORY}/commits/${COMMIT_SHA}/pulls"
           response=$(curl -sS -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "$api_url")
           export RESPONSE_JSON="$response"
