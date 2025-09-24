@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    types: [closed]
+    branches:
+      - main
 
 jobs:
   build-and-publish:
@@ -24,6 +28,20 @@ jobs:
           REPOSITORY: ${{ github.repository }}
           COMMIT_SHA: ${{ github.sha }}
         run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # For PR 'closed' event, we have the head ref directly
+            PR_MERGED=${{ github.event.pull_request.merged }}
+            PR_HEAD=${{ github.event.pull_request.head.ref }}
+            if [ "$PR_MERGED" = "true" ] && [[ "$PR_HEAD" == release/* ]]; then
+              echo "should_release=true" >> "$GITHUB_OUTPUT"
+              echo "release_ref=$PR_HEAD" >> "$GITHUB_OUTPUT"
+              exit 0
+            else
+              echo "should_release=false" >> "$GITHUB_OUTPUT"
+              echo "release_ref=" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
           set -euo pipefail
           api_url="https://api.github.com/repos/${REPOSITORY}/commits/${COMMIT_SHA}/pulls"
           response=$(curl -sS -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "$api_url")
