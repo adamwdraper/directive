@@ -42,9 +42,23 @@ def run_command(*args: str, capture_output: bool = False) -> subprocess.Complete
         raise
 
 
-def ensure_clean_working_tree() -> None:
+def ensure_clean_working_tree(strict_lock: bool = False) -> None:
+    """Ensure the working tree is clean before releasing.
+
+    By default, ignore changes to 'uv.lock' because running this script via
+    'uv run' may cause transient lockfile updates prior to process launch.
+    Use --strict-lock to enforce a fully clean tree including 'uv.lock'.
+    """
     proc = run_git_command("status", "--porcelain", capture_output=True)
-    if proc.stdout.strip():
+    dirty: list[str] = []
+    for line in (proc.stdout or "").splitlines():
+        # Format: 'XY <path>' where XY are status codes
+        path = line[3:] if len(line) > 3 else line
+        if not strict_lock and path == "uv.lock":
+            continue
+        dirty.append(line)
+    if dirty:
+        print("\n".join(dirty))
         fail("Working tree is dirty. Commit or stash changes before running release.")
 
 
@@ -197,6 +211,11 @@ def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Bump version and create a release branch")
     parser.add_argument("bump", choices=["major", "minor", "patch"], help="Type of version bump")
     parser.add_argument("--base-branch", "-b", default="main", help="Base branch to cut release from (default: main)")
+    parser.add_argument(
+        "--strict-lock",
+        action="store_true",
+        help="Fail if uv.lock is modified (default: ignore uv.lock changes)",
+    )
     args = parser.parse_args(argv)
 
     # Ensure inside a git repo
@@ -205,7 +224,7 @@ def main(argv: list[str] | None = None) -> None:
     except SystemExit:
         raise
 
-    ensure_clean_working_tree()
+    ensure_clean_working_tree(strict_lock=args.strict_lock)
     # Ensure we are up to date with the base branch before editing files
     update_base_branch(args.base_branch)
 
