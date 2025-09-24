@@ -166,6 +166,21 @@ def open_pull_request(new_version: str, branch_name: str) -> None:
         print("Could not determine repo slug to open PR URL.")
 
 
+def update_base_branch(base_branch: str) -> None:
+    """Checkout the base branch and fast-forward to origin."""
+    # Fetch latest refs
+    run_git_command("fetch", "origin", "--prune")
+    # Checkout the base branch (create local if missing)
+    try:
+        run_git_command("rev-parse", "--verify", base_branch, capture_output=True)
+        run_git_command("checkout", base_branch)
+    except SystemExit:
+        # Local branch missing; create tracking from origin
+        run_git_command("checkout", "-b", base_branch, f"origin/{base_branch}")
+    # Fast-forward only
+    run_git_command("pull", "--ff-only", "origin", base_branch)
+
+
 def create_and_push_release_branch(new_version: str) -> None:
     branch_name = f"release/v{new_version}"
     # Create and switch to new branch BEFORE committing, so base branch stays untouched
@@ -181,6 +196,7 @@ def create_and_push_release_branch(new_version: str) -> None:
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Bump version and create a release branch")
     parser.add_argument("bump", choices=["major", "minor", "patch"], help="Type of version bump")
+    parser.add_argument("--base-branch", "-b", default="main", help="Base branch to cut release from (default: main)")
     args = parser.parse_args(argv)
 
     # Ensure inside a git repo
@@ -190,6 +206,8 @@ def main(argv: list[str] | None = None) -> None:
         raise
 
     ensure_clean_working_tree()
+    # Ensure we are up to date with the base branch before editing files
+    update_base_branch(args.base_branch)
 
     pyproject_path = Path("pyproject.toml")
     current_version = read_current_version(pyproject_path)
