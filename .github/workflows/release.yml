@@ -1,114 +1,44 @@
 name: Release to PyPI
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     types: [closed]
     branches:
       - main
-  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build-and-publish:
-    name: Build and publish if release merge
+    name: Build and publish if release PR merged
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release/')
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Check if this commit merged a release branch
-        id: check
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPOSITORY: ${{ github.repository }}
-          COMMIT_SHA: ${{ github.sha }}
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "should_release=true" >> "$GITHUB_OUTPUT"
-            echo "release_ref=manual" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            # For PR 'closed' event, we have the head ref directly
-            PR_MERGED=${{ github.event.pull_request.merged }}
-            PR_HEAD=${{ github.event.pull_request.head.ref }}
-            if [ "$PR_MERGED" = "true" ] && [[ "$PR_HEAD" == release/* ]]; then
-              echo "should_release=true" >> "$GITHUB_OUTPUT"
-              echo "release_ref=$PR_HEAD" >> "$GITHUB_OUTPUT"
-              exit 0
-            else
-              echo "should_release=false" >> "$GITHUB_OUTPUT"
-              echo "release_ref=" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-          fi
-          set -euo pipefail
-          # Heuristic: parse merge commit message for source branch when pushed to main
-          msg=$(git log -1 --pretty=%B)
-          if echo "$msg" | grep -E "from .*/release/" >/dev/null 2>&1; then
-            src=$(echo "$msg" | sed -nE 's/.*from [^/]+\/(release\/[A-Za-z0-9._\-\/]+).*/\1/p' | head -n1)
-            if [ -n "$src" ]; then
-              echo "should_release=true" >> "$GITHUB_OUTPUT"
-              echo "release_ref=$src" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-          fi
-          api_url="https://api.github.com/repos/${REPOSITORY}/commits/${COMMIT_SHA}/pulls"
-          response=$(curl -sS -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "$api_url")
-          export RESPONSE_JSON="$response"
-          python - << 'PY'
-import json, os
-resp_text = os.environ.get('RESPONSE_JSON', '[]')
-try:
-    resp = json.loads(resp_text)
-except Exception:
-    resp = []
-should_release = False
-release_ref = ''
-for pr in resp:
-    base = (pr.get('base') or {}).get('ref')
-    head = (pr.get('head') or {}).get('ref') or ''
-    if base == 'main' and head.startswith('release/'):
-        should_release = True
-        release_ref = head
-        break
-out = open(os.environ['GITHUB_OUTPUT'], 'a')
-out.write(f"should_release={'true' if should_release else 'false'}\n")
-out.write(f"release_ref={release_ref}\n")
-out.close()
-print(f"should_release={should_release} release_ref={release_ref}")
-PY
-
       - name: Set up Python
-        if: steps.check.outputs.should_release == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install build deps
-        if: steps.check.outputs.should_release == 'true'
         run: |
           python -m pip install --upgrade pip
           pip install build twine hatchling
 
       - name: Build distributions
-        if: steps.check.outputs.should_release == 'true'
         run: |
           python -m build
 
       - name: Twine check
-        if: steps.check.outputs.should_release == 'true'
         run: |
           python -m twine check dist/*
 
       - name: Publish to PyPI
-        if: steps.check.outputs.should_release == 'true'
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
