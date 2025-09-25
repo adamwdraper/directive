@@ -157,7 +157,7 @@ toml = [
 
 [[package]]
 name = "directive"
-version = "0.0.8"
+version = "0.0.7"
 source = { editable = "." }
 dependencies = [
     { name = "mcp" },
