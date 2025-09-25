@@ -2,13 +2,24 @@ from pathlib import Path
 import json
 import subprocess
 import sys
+import os
 
 
 def _run_server_once(cwd: Path, request: dict) -> dict:
     # Launch the server and send a single JSON-RPC request over stdio
+    repo_root = Path(__file__).resolve().parents[1]
+    src_dir = repo_root / "src"
+    env = os.environ.copy()
+    existing = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = (str(src_dir) + (os.pathsep + existing if existing else ""))
     proc = subprocess.Popen(
-        [sys.executable, "-c", "from directive.server import serve_stdio; import sys, json; serve_stdio(__import__('pathlib').Path.cwd().joinpath('directive'))"],
+        [
+            sys.executable,
+            "-c",
+            "from directive.server import serve_stdio; import sys, json; serve_stdio(__import__('pathlib').Path.cwd().joinpath('directive'))",
+        ],
         cwd=str(cwd),
+        env=env,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -109,9 +120,19 @@ def test_tools_call_files_get_and_list(tmp_path: Path):
 
 def _run_server_once_with_headers(cwd: Path, request: dict, extra_headers: list[tuple[str, str]]) -> dict:
     # Launch the server and send a single JSON-RPC request over stdio with extra headers
+    repo_root = Path(__file__).resolve().parents[1]
+    src_dir = repo_root / "src"
+    env = os.environ.copy()
+    existing = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = (str(src_dir) + (os.pathsep + existing if existing else ""))
     proc = subprocess.Popen(
-        [sys.executable, "-c", "from directive.server import serve_stdio; import sys, json; serve_stdio(__import__('pathlib').Path.cwd().joinpath('directive'))"],
+        [
+            sys.executable,
+            "-c",
+            "from directive.server import serve_stdio; import sys, json; serve_stdio(__import__('pathlib').Path.cwd().joinpath('directive'))",
+        ],
         cwd=str(cwd),
+        env=env,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,

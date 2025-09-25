@@ -2,11 +2,18 @@ from pathlib import Path
 import json
 import subprocess
 import sys
+import os
 
 
 def _run_cli(args, cwd: Path):
     cmd = [sys.executable, "-m", "directive.cli"] + args
-    return subprocess.run(cmd, cwd=str(cwd), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    # Ensure child process can import from src/
+    repo_root = Path(__file__).resolve().parents[1]
+    src_dir = repo_root / "src"
+    env = os.environ.copy()
+    existing = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = (str(src_dir) + (os.pathsep + existing if existing else ""))
+    return subprocess.run(cmd, cwd=str(cwd), env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
 
 def test_cli_init_and_bundle_outputs_json(tmp_path: Path, monkeypatch):
