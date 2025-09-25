@@ -17,6 +17,7 @@ How it works (brief): Work is gated by explicit review checkpoints â€” **Spec â†
   - In a project: `uv add directive` (adds to `pyproject.toml` and `uv.lock`)
 - Initialize defaults in your repo:
   - `uv run directive init` (non-destructive; creates `directive/` with AOP, Context, and templates)
+    - You'll be prompted: "Add recommended Cursor setup (MCP server config + Project Rule)? (Y/n)". If you accept (default Yes), it will also create `.cursor/mcp.json`, `.cursor/servers/directive.sh`, and `.cursor/rules/directive-core-protocol.mdc`.
 - Configure your MCP-aware IDE/agent to launch the server:
   - Command: `uv run directive mcp serve` (stdio)
   - Tools are auto-discovered via `tools/list`; the agent will fetch Spec/Impact/TDR templates and context automatically.
@@ -34,8 +35,8 @@ How it works (brief): Work is gated by explicit review checkpoints â€” **Spec â†
 1. Ensure your project has Directive installed and initialized:
    - `uv add directive`
    - `uv run directive init`
-2. MCP config for Cursor (autoâ€‘created by `directive init` if missing):
-   - `uv run directive init` will create `.cursor/mcp.json` and `.cursor/servers/directive.sh` if they don't exist.
+2. MCP config for Cursor and Project Rule (optional via `directive init`):
+   - `uv run directive init` will prompt to add recommended Cursor setup (default Yes). If accepted, it creates `.cursor/mcp.json`, `.cursor/servers/directive.sh`, and `.cursor/rules/directive-core-protocol.mdc` if they don't exist.
    - If you already have `.cursor/mcp.json`, copy/merge the following JSON into your existing file:
 
 ```

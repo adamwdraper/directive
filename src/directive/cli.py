@@ -19,6 +19,34 @@ def _err(msg: str) -> None:
     sys.stderr.flush()
 
 
+def _ask_yes_no(question: str, default_yes: bool = True) -> bool:
+    """Ask a yes/no question on the terminal, defaulting to Yes/No.
+
+    If stdin is not a TTY (non-interactive), returns the default.
+    """
+    try:
+        is_tty = sys.stdin.isatty()
+    except Exception:
+        is_tty = False
+
+    suffix = "(Y/n)" if default_yes else "(y/N)"
+    prompt = f"{question} {suffix} "
+
+    if not is_tty:
+        _print(f"{question} {suffix} -> defaulting to {'Yes' if default_yes else 'No'} (non-interactive)")
+        return default_yes
+
+    while True:
+        resp = input(prompt).strip().lower()
+        if resp == "":
+            return default_yes
+        if resp in ("y", "yes"):
+            return True
+        if resp in ("n", "no"):
+            return False
+        _print("Please answer 'y' or 'n'.")
+
+
 def _package_data_root() -> Path:
     try:
         import importlib.resources as resources
@@ -135,6 +163,62 @@ exit 127
     return created, skipped, notes
 
 
+def _ensure_core_rule(repo_root: Path, overwrite: bool = False) -> Tuple[int, int, List[str]]:
+    """Create the Directive Core Protocol rule file for Cursor.
+
+    File:
+      - .cursor/rules/directive-core-protocol.mdc
+
+    Returns: (created_count, skipped_count, notes)
+    """
+    created = 0
+    skipped = 0
+    notes: List[str] = []
+
+    rules_dir = repo_root.joinpath(".cursor", "rules")
+    rules_dir.mkdir(parents=True, exist_ok=True)
+
+    rule_path = rules_dir.joinpath("directive-core-protocol.mdc")
+    rule_body = """---
+description: Directive Core Protocol (Gates before code)
+alwaysApply: true
+---
+
+Follow Directive AOP gates. Do not write code until these are produced and approved:
+1) Spec → `/directive/specs/<feature>/spec.md`
+2) Impact Analysis → `/directive/specs/<feature>/impact.md`
+3) TDR (high‑level, decisive about interfaces) → `/directive/specs/<feature>/tdr.md`
+
+When implementing post‑approval, operate strictly with TDD (failing test → minimal impl → refactor).
+
+@directive/reference/agent_operating_procedure.md
+@directive/reference/agent_context.md
+@directive/reference/templates/spec_template.md
+@directive/reference/templates/impact_template.md
+@directive/reference/templates/tdr_template.md
+"""
+
+    if rule_path.exists() and not overwrite:
+        skipped += 1
+        notes.append(f"skip existing: {rule_path}")
+    else:
+        rule_path.write_text(rule_body + "\n", encoding="utf-8")
+        created += 1
+        notes.append(f"wrote: {rule_path}")
+
+    return created, skipped, notes
+
+
+def _copy_cursor_templates(repo_root: Path, overwrite: bool = False) -> Tuple[int, int, List[str]]:
+    """Copy packaged Cursor templates (mcp.json, servers script, rules) into .cursor/.
+
+    Files live under package data at data/directive/cursor/ and maintain structure.
+    """
+    src = _package_data_root().joinpath("cursor")
+    dst = repo_root.joinpath(".cursor")
+    return _copy_tree(src, dst, overwrite=overwrite)
+
+
 def cmd_init(args: argparse.Namespace) -> int:
     repo_root = Path.cwd()
     target = repo_root.joinpath("directive")
@@ -146,12 +230,16 @@ def cmd_init(args: argparse.Namespace) -> int:
     if args.verbose:
         for n in notes:
             _print(n)
-    # Ensure Cursor launcher and mcp.json
-    c_created, c_skipped, c_notes = _ensure_cursor_launcher(repo_root, overwrite=False)
-    _print(f"Prepared .cursor/ (created {c_created}, skipped {c_skipped})")
-    if args.verbose:
-        for n in c_notes:
-            _print(n)
+
+    # Combined prompt for Cursor setup (MCP server config + Project Rule)
+    if _ask_yes_no("Add recommended Cursor setup (MCP server config + Project Rule)?", default_yes=True):
+        c_created, c_skipped, c_notes = _copy_cursor_templates(repo_root, overwrite=False)
+        _print(f"Prepared .cursor/ (created {c_created}, skipped {c_skipped})")
+        if args.verbose:
+            for n in c_notes:
+                _print(n)
+    else:
+        _print("Skipped Cursor setup per user selection.")
     return 0
 
 

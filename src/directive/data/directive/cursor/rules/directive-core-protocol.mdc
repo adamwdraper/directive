@@ -1,0 +1,17 @@
+---
+description: Directive Core Protocol (Gates before code)
+alwaysApply: true
+---
+
+Follow Directive AOP gates. Do not write code until these are produced and approved:
+1) Spec → `/directive/specs/<feature>/spec.md`
+2) Impact Analysis → `/directive/specs/<feature>/impact.md`
+3) TDR (high‑level, decisive about interfaces) → `/directive/specs/<feature>/tdr.md`
+
+When implementing post‑approval, operate strictly with TDD (failing test → minimal impl → refactor).
+
+@directive/reference/agent_operating_procedure.md
+@directive/reference/agent_context.md
+@directive/reference/templates/spec_template.md
+@directive/reference/templates/impact_template.md
+@directive/reference/templates/tdr_template.md

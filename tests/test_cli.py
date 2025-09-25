@@ -35,3 +35,38 @@ def test_cli_init_and_bundle_outputs_json(tmp_path: Path, monkeypatch):
     assert data["template"]["path"].endswith("spec_template.md")
 
 
+def test_cli_init_creates_rule_noninteractive(tmp_path: Path):
+    # Non-interactive default is Yes; should create the core rule
+    res = _run_cli(["init"], tmp_path)
+    assert res.returncode == 0
+    assert (tmp_path / ".cursor" / "rules" / "directive-core-protocol.mdc").exists()
+
+
+def test_cli_init_decline_skips_cursor_setup(tmp_path: Path, monkeypatch):
+    # Call cmd_init directly with a TTY and input('n') to decline
+    from directive import cli as dcli  # type: ignore
+
+    class Args:
+        verbose = False
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("sys.stdin.isatty", lambda: True)
+    monkeypatch.setattr("builtins.input", lambda _: "n")
+
+    rc = dcli.cmd_init(Args())
+    assert rc == 0
+    # .cursor directory should not be created when declined
+    assert not (tmp_path / ".cursor").exists()
+
+
+def test_cli_init_second_run_verbose_skips(tmp_path: Path):
+    # First run creates files
+    res1 = _run_cli(["init"], tmp_path)
+    assert res1.returncode == 0
+    # Second run with --verbose should print skip messages
+    res2 = _run_cli(["--verbose", "init"], tmp_path)
+    assert res2.returncode == 0
+    out = res2.stdout
+    assert "skip existing:" in out
+
+
