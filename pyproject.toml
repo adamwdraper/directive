@@ -41,9 +41,11 @@ Issues = "https://github.com/adamwdraper/directive/issues"
 [tool.hatch.build.targets.wheel]
 packages = ["src/directive"]
 
-[tool.hatch.build]
+[tool.hatch.build.targets.sdist]
 include = [
-  "src/directive/data/**",
+  "src/**",
+  "README.md",
+  "LICENSE",
 ]
 
 
