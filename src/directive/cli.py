@@ -163,52 +163,6 @@ exit 127
     return created, skipped, notes
 
 
-def _ensure_core_rule(repo_root: Path, overwrite: bool = False) -> Tuple[int, int, List[str]]:
-    """Create the Directive Core Protocol rule file for Cursor.
-
-    File:
-      - .cursor/rules/directive-core-protocol.mdc
-
-    Returns: (created_count, skipped_count, notes)
-    """
-    created = 0
-    skipped = 0
-    notes: List[str] = []
-
-    rules_dir = repo_root.joinpath(".cursor", "rules")
-    rules_dir.mkdir(parents=True, exist_ok=True)
-
-    rule_path = rules_dir.joinpath("directive-core-protocol.mdc")
-    rule_body = """---
-description: Directive Core Protocol (Gates before code)
-alwaysApply: true
----
-
-Follow Directive AOP gates. Do not write code until these are produced and approved:
-1) Spec → `/directive/specs/<feature>/spec.md`
-2) Impact Analysis → `/directive/specs/<feature>/impact.md`
-3) TDR (high‑level, decisive about interfaces) → `/directive/specs/<feature>/tdr.md`
-
-When implementing post‑approval, operate strictly with TDD (failing test → minimal impl → refactor).
-
-@directive/reference/agent_operating_procedure.md
-@directive/reference/agent_context.md
-@directive/reference/templates/spec_template.md
-@directive/reference/templates/impact_template.md
-@directive/reference/templates/tdr_template.md
-"""
-
-    if rule_path.exists() and not overwrite:
-        skipped += 1
-        notes.append(f"skip existing: {rule_path}")
-    else:
-        rule_path.write_text(rule_body + "\n", encoding="utf-8")
-        created += 1
-        notes.append(f"wrote: {rule_path}")
-
-    return created, skipped, notes
-
-
 def _copy_cursor_templates(repo_root: Path, overwrite: bool = False) -> Tuple[int, int, List[str]]:
     """Copy packaged Cursor templates (mcp.json, servers script, rules) into .cursor/.
 
