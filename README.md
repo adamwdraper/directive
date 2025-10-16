@@ -25,24 +25,23 @@ How it works (brief): Work is gated by explicit review checkpoints — **Spec �
 - (Optional) Inspect a bundle directly:
   - `uv run directive bundle spec_template.md` (prints a JSON bundle to stdout)
 
-### Exposed tools (discovered automatically)
-- `directive/templates.spec`: Spec bundle (AOP, Agent Context, Spec template, Primer)
-- `directive/templates.impact`: Impact bundle
-- `directive/templates.tdr`: TDR bundle
-- `directive/files.get`: Read a file under `directive/` by path
-- `directive/files.list`: List files under `directive/`
+### Using with Cursor (or any AI coding assistant)
 
-### Using with Cursor
-1. Ensure your project has Directive installed and initialized:
+1. Install and initialize:
    - `uv add directive`
    - `uv run directive init`
-2. Cursor Project Rules (recommended):
-   - `uv run directive init` will prompt to add Cursor Project Rules (default Yes). If accepted, it creates `.cursor/rules/directive-core-protocol.mdc` which tells Cursor agents to follow the Directive workflow.
-3. MCP Server (optional, for advanced features):
-   - The MCP server provides additional tools for accessing templates and context files directly
-   - To set it up manually, create or update `.cursor/mcp.json` with the following configuration:
+2. Accept Cursor Project Rules when prompted (recommended):
+   - Creates `.cursor/rules/directive-core-protocol.mdc` which tells agents to follow the Directive workflow
+   - This is usually all you need — the directive files are plain text that agents can read directly
 
-```
+### Optional: MCP Server (probably not needed)
+
+The MCP server provides programmatic access to templates and context files. **Most users won't need this** — agents work fine reading the `directive/` folder directly.
+
+If you want to set it up anyway (works with Cursor or any MCP-compatible tool):
+
+1. Create or update `.cursor/mcp.json` (or your IDE's equivalent):
+```json
 {
   "mcpServers": {
     "Directive": {
@@ -55,13 +54,18 @@ How it works (brief): Work is gated by explicit review checkpoints — **Spec �
 }
 ```
 
-3. You should now be able to see the enabled MCP server in Cursor Settings -> MCP
+2. The server exposes these tools:
+   - `directive/templates.spec`: Spec bundle (AOP, Agent Context, Spec template)
+   - `directive/templates.impact`: Impact bundle
+   - `directive/templates.tdr`: TDR bundle
+   - `directive/files.get`: Read any file under `directive/`
+   - `directive/files.list`: List all files under `directive/`
 
 ## Workflow
 
 The Agent Operating Procedure (`/directive/reference/agent_operating_procedure.md`) is a concise, enforceable checklist that defines the Spec → Impact → TDR → Implementation flow and its review gates.
 
-To use it in your project, you can use the MCP server (auto-discovers templates and context), or do it manually by including the single directory `/directive/reference/` in the agent's context (contains `agent_operating_procedure.md`, `agent_context.md`, and templates).
+To use it in your project, simply include the `/directive/reference/` directory in your agent's context (contains `agent_operating_procedure.md`, `agent_context.md`, and templates). Agents can read these files directly — no special tooling required.
 
 Step 1 — Customize Agent Context
 - Tailor `/directive/reference/agent_context.md` to your project (languages, tooling, conventions, security, testing). Refer to `agent_operating_procedure.md` for the end‑to‑end flow.
