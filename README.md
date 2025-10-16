@@ -17,8 +17,9 @@ How it works (brief): Work is gated by explicit review checkpoints â€” **Spec â†
   - In a project: `uv add directive` (adds to `pyproject.toml` and `uv.lock`)
 - Initialize defaults in your repo:
   - `uv run directive init` (non-destructive; creates `directive/` with AOP, Context, and templates)
-    - You'll be prompted: "Add recommended Cursor setup (MCP server config + Project Rule)? (Y/n)". If you accept (default Yes), it will also create `.cursor/mcp.json`, `.cursor/servers/directive.sh`, and `.cursor/rules/directive-core-protocol.mdc`.
-- Configure your MCP-aware IDE/agent to launch the server:
+    - You'll be prompted: "Add recommended Cursor Project Rules? (Y/n)". If you accept (default Yes), it will create `.cursor/rules/directive-core-protocol.mdc` with the core workflow rules.
+- (Optional) Configure MCP server for advanced IDE integration:
+  - The MCP server is optional and can be set up manually if needed (see "Using with Cursor" section below)
   - Command: `uv run directive mcp serve` (stdio)
   - Tools are auto-discovered via `tools/list`; the agent will fetch Spec/Impact/TDR templates and context automatically.
 - (Optional) Inspect a bundle directly:
@@ -31,13 +32,15 @@ How it works (brief): Work is gated by explicit review checkpoints â€” **Spec â†
 - `directive/files.get`: Read a file under `directive/` by path
 - `directive/files.list`: List files under `directive/`
 
-### Using with Cursor (MCP)
+### Using with Cursor
 1. Ensure your project has Directive installed and initialized:
    - `uv add directive`
    - `uv run directive init`
-2. MCP config for Cursor and Project Rule (optional via `directive init`):
-   - `uv run directive init` will prompt to add recommended Cursor setup (default Yes). If accepted, it creates `.cursor/mcp.json`, `.cursor/servers/directive.sh`, and `.cursor/rules/directive-core-protocol.mdc` if they don't exist.
-   - If you already have `.cursor/mcp.json`, copy/merge the following JSON into your existing file:
+2. Cursor Project Rules (recommended):
+   - `uv run directive init` will prompt to add Cursor Project Rules (default Yes). If accepted, it creates `.cursor/rules/directive-core-protocol.mdc` which tells Cursor agents to follow the Directive workflow.
+3. MCP Server (optional, for advanced features):
+   - The MCP server provides additional tools for accessing templates and context files directly
+   - To set it up manually, create or update `.cursor/mcp.json` with the following configuration:
 
 ```
 {
