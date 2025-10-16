@@ -9,9 +9,9 @@ Problems this aims to solve:
 - **Replacing chatty back‑and‑forth with upfront, versioned specs**: Author concise specs first to avoid prompt drift; keep a single source of truth that onboards collaborators quickly.
 - **Specs as durable, reviewable artifacts and canonical history**: Spec → Impact → TDR live in the repo, capturing decisions and enabling traceability; Spec→Test mapping turns requirements into verification.
 
-How it works (brief): Work is gated by explicit review checkpoints — **Spec → Impact → TDR** — with no code before approval. After approval, follow strict TDD with Spec→Test mapping. Everything lives in‑repo and is exposed via a tiny MCP server for IDEs like Cursor. See the supporting background in [Research & Rationale](#research--rationale).
+How it works (brief): Work is gated by explicit review checkpoints — **Spec → Impact → TDR** — with no code before approval. After approval, follow strict TDD with Spec→Test mapping. Everything lives in‑repo as plain files that agents can access directly, with optional MCP server integration for enhanced IDE features. See the supporting background in [Research & Rationale](#research--rationale).
 
-## Quickstart (CLI + MCP)
+## Quickstart
 
 - Install (using uv):
   - In a project: `uv add directive` (adds to `pyproject.toml` and `uv.lock`)
