@@ -167,9 +167,25 @@ def _copy_cursor_templates(repo_root: Path, overwrite: bool = False) -> Tuple[in
     """Copy packaged Cursor templates (mcp.json, servers script, rules) into .cursor/.
 
     Files live under package data at data/directive/cursor/ and maintain structure.
+    
+    DEPRECATED: This function is kept for reference but no longer used by init/update.
+    Use _copy_cursor_rules_only() instead.
     """
     src = _package_data_root().joinpath("cursor")
     dst = repo_root.joinpath(".cursor")
+    return _copy_tree(src, dst, overwrite=overwrite)
+
+
+def _copy_cursor_rules_only(repo_root: Path, overwrite: bool = False) -> Tuple[int, int, List[str]]:
+    """Copy only Cursor project rules from package data, not MCP server config.
+    
+    Copies only the rules/ subdirectory to .cursor/rules/, skipping mcp.json
+    and servers/ directory which are not needed for agents to work with directive.
+    
+    Returns: (copied_count, skipped_count, notes)
+    """
+    src = _package_data_root().joinpath("cursor", "rules")
+    dst = repo_root.joinpath(".cursor", "rules")
     return _copy_tree(src, dst, overwrite=overwrite)
 
 
@@ -185,10 +201,10 @@ def cmd_init(args: argparse.Namespace) -> int:
         for n in notes:
             _print(n)
 
-    # Combined prompt for Cursor setup (MCP server config + Project Rule)
-    if _ask_yes_no("Add recommended Cursor setup (MCP server config + Project Rule)?", default_yes=True):
-        c_created, c_skipped, c_notes = _copy_cursor_templates(repo_root, overwrite=False)
-        _print(f"Prepared .cursor/ (created {c_created}, skipped {c_skipped})")
+    # Prompt for Cursor Project Rules only (not MCP server)
+    if _ask_yes_no("Add recommended Cursor Project Rules?", default_yes=True):
+        c_created, c_skipped, c_notes = _copy_cursor_rules_only(repo_root, overwrite=False)
+        _print(f"Created .cursor/rules/ (copied {c_created}, skipped {c_skipped})")
         if args.verbose:
             for n in c_notes:
                 _print(n)
@@ -209,12 +225,8 @@ def cmd_update(args: argparse.Namespace) -> int:
     if args.verbose:
         for n in notes:
             _print(n)
-    # Refresh Cursor launcher and mcp.json to latest template
-    c_created, c_skipped, c_notes = _ensure_cursor_launcher(repo_root, overwrite=True)
-    _print(f"Updated .cursor/ (created {c_created}, overwrote {c_skipped})")
-    if args.verbose:
-        for n in c_notes:
-            _print(n)
+    # Note: We no longer update .cursor/ files to avoid modifying user's Cursor config
+    # Users can manually update Cursor rules if needed
     return 0
 
 
