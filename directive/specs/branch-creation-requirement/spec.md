@@ -31,10 +31,10 @@ The AOP should:
 - [ ] The AOP document clearly states that a new branch must be created before starting work
 - [ ] The branch naming convention is specified (e.g., `feature/<spec-name>`)
 - [ ] The branch creation step is positioned early in the workflow, before any code is written
-- [ ] A new implementation summary template is created at `/directive/reference/templates/implementation_template.md`
+- [ ] A new implementation summary template is created at `/directive/reference/templates/implementation_summary_template.md`
 - [ ] The AOP requires creating an implementation summary when coding begins (Step 4)
 - [ ] The AOP specifies that the implementation summary should be updated as work progresses
-- [ ] The implementation summary is saved alongside other spec documents at `/directive/specs/<feature>/implementation.md`
+- [ ] The implementation summary is saved alongside other spec documents at `/directive/specs/<feature>/implementation_summary.md`
 
 ## User Story
 As an agent following the AOP, I want clear instructions to create a new branch for each spec and maintain an implementation summary, so that I work in isolation, don't accidentally modify the main branch, and provide clear documentation of what was actually implemented for reviewers.
@@ -45,7 +45,7 @@ As an agent following the AOP, I want clear instructions to create a new branch 
 2. Agent checks current branch (should be main initially)
 3. Agent creates a new branch from main with naming convention `feature/<spec-name>`
 4. Agent proceeds with the standard AOP workflow (impact analysis, TDR)
-5. After TDR approval, when coding begins, agent creates `implementation.md` in the spec folder
+5. After TDR approval, when coding begins, agent creates `implementation_summary.md` in the spec folder
 6. As agent writes code, agent updates the implementation summary with changes made
 7. Before PR submission, agent ensures implementation summary is complete and accurate
 
@@ -78,7 +78,7 @@ N/A - This is a process documentation change
 - Given the branch naming convention, when an agent creates a branch, then it follows the format `feature/<spec-name>` where `<spec-name>` matches the spec folder name
 
 ### Implementation Summary
-- Given an agent beginning implementation (Step 4), when they start coding, then they first create `/directive/specs/<feature>/implementation.md` using the implementation template
+- Given an agent beginning implementation (Step 4), when they start coding, then they first create `/directive/specs/<feature>/implementation_summary.md` using the implementation summary template
 - Given an agent making code changes, when they complete a meaningful unit of work (e.g., a test passing, a feature implemented), then they update the implementation summary with the changes
 - Given an agent completing implementation, when they prepare to submit a PR, then the implementation summary accurately reflects all files changed, decisions made, tests added, and dependencies modified
 - Given a reviewer reading the PR, when they check the spec folder, then they find an implementation summary that clearly documents what was actually built vs. what was designed in the TDR

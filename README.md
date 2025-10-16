@@ -1,45 +1,49 @@
 # Directive: Spec‑first approach to working with AI coding agents
 
-Write specs, not chats.
+Spec first, chat less. 
 
-A spec‑first approach to increase coding agent accuracy and developer efficiency. It replaces ad‑hoc back‑and‑forth with concise, versioned specs that become the canonical history of your work.
+Increase coding agent accuracy and developer efficiency by replacing ad‑hoc back‑and‑forth with concise, versioned specs that become the canonical history of your work.
 
 Problems this aims to solve:
 - **Improving agent accuracy and developer efficiency**: Clear specs reduce ambiguity and rework, speed up iterations, and align expectations between humans and agents.
 - **Replacing chatty back‑and‑forth with upfront, versioned specs**: Author concise specs first to avoid prompt drift; keep a single source of truth that onboards collaborators quickly.
 - **Specs as durable, reviewable artifacts and canonical history**: Spec → Impact → TDR live in the repo, capturing decisions and enabling traceability; Spec→Test mapping turns requirements into verification.
 
-How it works (brief): Work is gated by explicit review checkpoints — **Spec → Impact → TDR** — with no code before approval. After approval, follow strict TDD with Spec→Test mapping. Everything lives in‑repo and is exposed via a tiny MCP server for IDEs like Cursor. See the supporting background in [Research & Rationale](#research--rationale).
+How it works (brief): Work is gated by explicit review checkpoints — **Spec → Impact → TDR** — with no code before approval. After approval, follow strict TDD with Spec→Test mapping. Everything lives in‑repo as plain files that agents can access directly, with optional MCP server integration for enhanced IDE features. See the supporting background in [Research & Rationale](#research--rationale).
 
-## Quickstart (CLI + MCP)
+> **Note**: Directive is a *way of working* with agents, not a rigid standard. The templates, workflow, and rules are starting points designed to be customized for your team's practices. Think of it as best-practice scaffolding that you adapt to fit your specific needs — whether that's simplifying steps, adding domain-specific checks, or adjusting terminology. The goal is to give agents clear, consistent context that matches how you actually work.
+
+## Quickstart
 
 - Install (using uv):
   - In a project: `uv add directive` (adds to `pyproject.toml` and `uv.lock`)
 - Initialize defaults in your repo:
   - `uv run directive init` (non-destructive; creates `directive/` with AOP, Context, and templates)
-    - You'll be prompted: "Add recommended Cursor setup (MCP server config + Project Rule)? (Y/n)". If you accept (default Yes), it will also create `.cursor/mcp.json`, `.cursor/servers/directive.sh`, and `.cursor/rules/directive-core-protocol.mdc`.
-- Configure your MCP-aware IDE/agent to launch the server:
+    - You'll be prompted: "Add recommended Cursor Project Rules? (Y/n)". If you accept (default Yes), it will create `.cursor/rules/directive-core-protocol.mdc` with the core workflow rules.
+- (Optional) Configure MCP server for advanced IDE integration:
+  - The MCP server is optional and can be set up manually if needed (see "Using with Cursor" section below)
   - Command: `uv run directive mcp serve` (stdio)
   - Tools are auto-discovered via `tools/list`; the agent will fetch Spec/Impact/TDR templates and context automatically.
 - (Optional) Inspect a bundle directly:
   - `uv run directive bundle spec_template.md` (prints a JSON bundle to stdout)
 
-### Exposed tools (discovered automatically)
-- `directive/templates.spec`: Spec bundle (AOP, Agent Context, Spec template, Primer)
-- `directive/templates.impact`: Impact bundle
-- `directive/templates.tdr`: TDR bundle
-- `directive/files.get`: Read a file under `directive/` by path
-- `directive/files.list`: List files under `directive/`
+### Using with Cursor (or any AI coding assistant)
 
-### Using with Cursor (MCP)
-1. Ensure your project has Directive installed and initialized:
+1. Install and initialize:
    - `uv add directive`
    - `uv run directive init`
-2. MCP config for Cursor and Project Rule (optional via `directive init`):
-   - `uv run directive init` will prompt to add recommended Cursor setup (default Yes). If accepted, it creates `.cursor/mcp.json`, `.cursor/servers/directive.sh`, and `.cursor/rules/directive-core-protocol.mdc` if they don't exist.
-   - If you already have `.cursor/mcp.json`, copy/merge the following JSON into your existing file:
+2. Accept Cursor Project Rules when prompted (recommended):
+   - Creates `.cursor/rules/directive-core-protocol.mdc` which tells agents to follow the Directive workflow
+   - This is usually all you need — the directive files are plain text that agents can read directly
 
-```
+### Optional: MCP Server (probably not needed)
+
+The MCP server provides programmatic access to templates and context files. **Most users won't need this** — agents work fine reading the `directive/` folder directly.
+
+If you want to set it up anyway (works with Cursor or any MCP-compatible tool):
+
+1. Create or update `.cursor/mcp.json` (or your IDE's equivalent):
+```json
 {
   "mcpServers": {
     "Directive": {
@@ -52,13 +56,18 @@ How it works (brief): Work is gated by explicit review checkpoints — **Spec �
 }
 ```
 
-3. You should now be able to see the enabled MCP server in Cursor Settings -> MCP
+2. The server exposes these tools:
+   - `directive/templates.spec`: Spec bundle (AOP, Agent Context, Spec template)
+   - `directive/templates.impact`: Impact bundle
+   - `directive/templates.tdr`: TDR bundle
+   - `directive/files.get`: Read any file under `directive/`
+   - `directive/files.list`: List all files under `directive/`
 
 ## Workflow
 
 The Agent Operating Procedure (`/directive/reference/agent_operating_procedure.md`) is a concise, enforceable checklist that defines the Spec → Impact → TDR → Implementation flow and its review gates.
 
-To use it in your project, you can use the MCP server (auto-discovers templates and context), or do it manually by including the single directory `/directive/reference/` in the agent's context (contains `agent_operating_procedure.md`, `agent_context.md`, and templates).
+To use it in your project, simply include the `/directive/reference/` directory in your agent's context (contains `agent_operating_procedure.md`, `agent_context.md`, and templates). Agents can read these files directly — no special tooling required.
 
 Step 1 — Customize Agent Context
 - Tailor `/directive/reference/agent_context.md` to your project (languages, tooling, conventions, security, testing). Refer to `agent_operating_procedure.md` for the end‑to‑end flow.

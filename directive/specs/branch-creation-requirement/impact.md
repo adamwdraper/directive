@@ -58,7 +58,7 @@ If we decide to add an MCP tool for implementation template:
   - Future enhancement: Could add CLI command to verify on correct branch
 - **Low Risk**: Implementation summary may be forgotten or not updated during development
   - Mitigation: Make it part of Step 4 (when coding begins) with clear reminder
-  - Future enhancement: Could add CI check to verify implementation.md exists in spec folder
+  - Future enhancement: Could add CI check to verify implementation_summary.md exists in spec folder
 
 ### Documentation Consistency
 - **Medium Risk**: Two copies of AOP exist (directive/ and src/directive/data/directive/)
@@ -66,7 +66,7 @@ If we decide to add an MCP tool for implementation template:
   - Consider: Add test or CI check to verify they're in sync
   
 ### Backward Compatibility
-- **Low Risk**: Existing specs don't have implementation.md files
+- **Low Risk**: Existing specs don't have implementation_summary.md files
   - Mitigation: This is forward-looking, applies to new specs only
   - No need to retroactively add implementation summaries to completed work
 
@@ -78,7 +78,7 @@ If we decide to add an MCP tool for implementation template:
 
 ### Metrics
 - Not applicable for documentation changes
-- Could track (in future): Number of specs with/without implementation.md
+- Could track (in future): Number of specs with/without implementation_summary.md
 
 ### Alerts
 - Not applicable

@@ -13,7 +13,7 @@
 ---
 
 ## Overview
-Updated the Agent Operating Procedure (AOP) to enforce branch creation before starting work and introduced a new implementation summary template. Changes include adding Step 0 (Branch Creation), updating deliverables to include implementation.md, modifying Step 4 to incorporate implementation tracking, and deploying the new template to both development and packaged locations.
+Updated the Agent Operating Procedure (AOP) to enforce branch creation before starting work and introduced a new implementation summary template. Changes include adding Step 0 (Branch Creation), updating deliverables to include implementation_summary.md, modifying Step 4 to incorporate implementation tracking, and deploying the new template to both development and packaged locations.
 
 ## Files Changed
 
@@ -23,10 +23,10 @@ Updated the Agent Operating Procedure (AOP) to enforce branch creation before st
 - `directive/specs/branch-creation-requirement/spec.md` — Spec document for this feature
 - `directive/specs/branch-creation-requirement/impact.md` — Impact analysis document
 - `directive/specs/branch-creation-requirement/tdr.md` — Technical design review document
-- `directive/specs/branch-creation-requirement/implementation.md` — This file
+- `directive/specs/branch-creation-requirement/implementation_summary.md` — This file
 
 ### Modified Files
-- `directive/reference/agent_operating_procedure.md` — Added Step 0 (Branch Creation), updated deliverables, modified Step 4 to include implementation.md creation and updates
+- `directive/reference/agent_operating_procedure.md` — Added Step 0 (Branch Creation), updated deliverables, modified Step 4 to include implementation_summary.md creation and updates
 - `src/directive/data/directive/reference/agent_operating_procedure.md` — Mirror of above changes to packaged version
 
 ### Deleted Files
@@ -36,7 +36,7 @@ None
 
 ### Decision 1: Minimal AOP Changes
 **Context**: Needed to add branch creation and implementation tracking without overwhelming the AOP  
-**Choice**: Added concise Step 0 for branch creation (3 lines), brief deliverable note, and integrated implementation.md into existing Step 4 workflow  
+**Choice**: Added concise Step 0 for branch creation (3 lines), brief deliverable note, and integrated implementation_summary.md into existing Step 4 workflow  
 **Rationale**: Keep AOP scannable and actionable; avoid verbose instructions  
 **Differs from TDR?**: No - TDR proposed this approach
 
@@ -110,9 +110,9 @@ Tests to be added in follow-up:
 - ✅ Verified implementation template exists at both locations
 - ✅ Verified AOP changes are identical in both locations
 - ✅ Verified Step 0 appears before Step 1
-- ✅ Verified deliverables section includes implementation.md
-- ✅ Verified Step 4 includes implementation.md creation and updates
-- ✅ Verified template list includes implementation_template.md
+- ✅ Verified deliverables section includes implementation_summary.md
+- ✅ Verified Step 4 includes implementation_summary.md creation and updates
+- ✅ Verified template list includes implementation_summary_template.md
 
 ## Configuration Changes
 
@@ -180,7 +180,7 @@ N/A - documentation is always active
   - Mitigation: Add tests to verify content matches (future enhancement)
 - **No automated enforcement**: Agents must follow AOP voluntarily
   - Future enhancement: CLI command to verify on correct branch
-  - Future enhancement: CI check for implementation.md existence
+  - Future enhancement: CI check for implementation_summary.md existence
 
 ## Deviations from TDR
 

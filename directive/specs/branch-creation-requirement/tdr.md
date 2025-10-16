@@ -12,7 +12,7 @@
 
 We are updating the Agent Operating Procedure (AOP) to enforce two critical workflow improvements:
 1. **Branch Creation Requirement**: Explicitly require agents to create a feature branch (format: `feature/<spec-name>`) before beginning any work on a spec, ensuring isolation from main branch
-2. **Implementation Summary**: Introduce a new deliverable document (`implementation.md`) that tracks actual implementation details, created when coding begins and updated throughout development until PR merge
+2. **Implementation Summary**: Introduce a new deliverable document (`implementation_summary.md`) that tracks actual implementation details, created when coding begins and updated throughout development until PR merge
 
 This ensures proper Git workflow hygiene and provides a clear bridge between design intent (TDR) and actual implementation, making PR reviews more effective.
 
@@ -118,7 +118,7 @@ Before beginning work on a spec, create a new feature branch:
 **Addition**:
 ```markdown
 ## Deliverables (during implementation)
-4. **Implementation Summary** — save as `/directive/specs/<feature>/implementation.md` — created when coding begins, updated throughout development
+4. **Implementation Summary** — save as `/directive/specs/<feature>/implementation_summary.md` — created when coding begins, updated throughout development
 ```
 
 #### 3. Update Template List
@@ -131,7 +131,7 @@ Before beginning work on a spec, create a new feature branch:
 #### 4. Update Step 4 (TDD Execution Rhythm)
 **Location**: Current Step 4  
 **Additions**:
-- Add initial step: "**Before first test**: Create `/directive/specs/<feature>/implementation.md` using the implementation template"
+- Add initial step: "**Before first test**: Create `/directive/specs/<feature>/implementation_summary.md` using the implementation summary template"
 - Add ongoing requirement: "**After each significant change**: Update implementation summary with files modified, decisions made, tests added"
 - Add completion requirement: "**Before PR submission**: Ensure implementation summary is complete and accurate"
 
@@ -180,7 +180,7 @@ Already created at `directive/reference/templates/implementation_template.md` wi
 **Approach**: Instead of separate file, add "Implementation Notes" section to TDR  
 **Pros**: Fewer files, design and implementation in one place  
 **Cons**: TDR should remain implementation-agnostic design document; mixing concerns makes TDR harder to review pre-implementation  
-**Decision**: Rejected, separate concerns between design (TDR) and actual implementation (implementation.md)
+**Decision**: Rejected, separate concerns between design (TDR) and actual implementation (implementation_summary.md)
 
 ### Alternative 4: Git Hook for Branch Enforcement
 **Approach**: Pre-commit hook that prevents commits to main  
@@ -194,8 +194,8 @@ Already created at `directive/reference/templates/implementation_template.md` wi
 This is purely documentation; no database or data storage changes.
 
 ### File System Contracts
-**New File**: `/directive/specs/<feature>/implementation.md` — Created per-spec during Step 4  
-**New Template**: `directive/reference/templates/implementation_template.md` — Already created  
+**New File**: `/directive/specs/<feature>/implementation_summary.md` — Created per-spec during Step 4  
+**New Template**: `directive/reference/templates/implementation_summary_template.md` — Already created  
 **Updated File**: `directive/reference/agent_operating_procedure.md` — Modified with new steps
 
 ### Package Data Contracts
@@ -206,7 +206,7 @@ This is purely documentation; no database or data storage changes.
 Existing MCP tools remain unchanged. Optional addition of `directive/templates.implementation` tool is out of scope.
 
 ### Backward Compatibility
-- ✅ Existing specs without implementation.md remain valid
+- ✅ Existing specs without implementation_summary.md remain valid
 - ✅ Existing tools continue to work unchanged
 - ✅ Existing template bundles continue to work
 - ✅ No breaking changes to any interfaces
@@ -230,7 +230,7 @@ No logging changes needed. Existing CLI and MCP server logging covers file opera
 
 ### Metrics
 No metrics collection. Future enhancement could track:
-- Number of specs with implementation.md
+- Number of specs with implementation_summary.md
 - Completeness score for implementation summaries
 
 ### Dashboards/Alerts
@@ -340,7 +340,7 @@ Not applicable — documentation operations are trivial performance-wise.
    - Future mitigation: Consider single source of truth with copy script
 
 3. **Incomplete Implementation Summaries** (Low)
-   - Risk: Agents may create but not update implementation.md
+   - Risk: Agents may create but not update implementation_summary.md
    - Mitigation: Explicit reminders in Step 4; make it part of review checklist
    - Future mitigation: Could add completeness scoring or CI check
 
@@ -366,8 +366,8 @@ Not applicable — documentation operations are trivial performance-wise.
 - DoD: 
   - [ ] Branch creation step added as Step 0
   - [ ] Implementation summary added to deliverables
-  - [ ] Step 4 updated with implementation.md creation/update requirements
-  - [ ] Template list includes implementation_template.md
+  - [ ] Step 4 updated with implementation_summary.md creation/update requirements
+  - [ ] Template list includes implementation_summary_template.md
   - [ ] Changes made to both directive/ and src/directive/data/directive/ locations
   - [ ] Tests written and passing
 
