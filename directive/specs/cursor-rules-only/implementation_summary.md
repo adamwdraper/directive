@@ -20,7 +20,7 @@ Removed MCP server configuration files from `directive init` workflow while pres
 - `directive/specs/cursor-rules-only/spec.md` — Feature specification
 - `directive/specs/cursor-rules-only/impact.md` — Impact analysis
 - `directive/specs/cursor-rules-only/tdr.md` — Technical design review
-- `directive/specs/cursor-rules-only/implementation.md` — This implementation summary
+- `directive/specs/cursor-rules-only/implementation_summary.md` — This implementation summary
 
 ### Modified Files
 - `src/directive/cli.py`:
