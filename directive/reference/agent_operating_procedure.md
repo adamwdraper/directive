@@ -5,6 +5,20 @@ This is the **standard workflow** the agent must follow for every new feature sp
 
 ---
 
+## 🚨 FIRST STEP — CREATE FEATURE BRANCH 🚨
+
+**BEFORE doing ANYTHING else (before drafting spec, before analysis, before ANY work):**
+
+1. Check current branch: `git branch --show-current`
+2. If not already on a feature branch, create one from main:
+   - Branch naming: `feature/<spec-name>` 
+   - The `<spec-name>` MUST match your spec folder name
+3. **NEVER work directly on main or master**
+
+**Example**: For a spec in `/directive/specs/cursor-rules-only/`, create branch `feature/cursor-rules-only`
+
+---
+
 Note: Templates to use during this process are located in `/directive/reference/templates/`:
 - Spec: `/directive/reference/templates/spec_template.md`
 - Impact: `/directive/reference/templates/impact_template.md`
@@ -17,6 +31,8 @@ Note: Templates to use during this process are located in `/directive/reference/
 - This AOP file
 
 ## Deliverables (before any code)
+**⚠️ Reminder: All deliverables must be created on a feature branch, not main**
+
 1. **Spec** — collaboratively drafted and accepted — saved at `/directive/specs/<feature>/spec.md`
 2. **Impact Analysis** — save as `/directive/specs/<feature>/impact.md`
 3. **Technical Design Review (TDR)** draft — save as `/directive/specs/<feature>/tdr.md`
@@ -25,9 +41,6 @@ Note: Templates to use during this process are located in `/directive/reference/
 4. **Implementation Summary** — save as `/directive/specs/<feature>/implementation.md` — track actual changes, decisions, and test coverage
 
 ---
-
-## Step 0 — Branch Creation
-**Before starting work**: Create a feature branch from main using the naming convention `feature/<spec-name>` where `<spec-name>` matches your spec folder. Never work directly on main.
 
 ## Step 1 — Repo Recon (Codebase Map)
 Produce a short “you are here” map:
@@ -85,6 +98,7 @@ After TDR approval, proceed directly to implementation:
 ---
 
 ## Review Checklist (pre‑implementation)
+- [ ] **Working on feature branch (not main) — verify with `git branch --show-current`**
 - [ ] Codebase Map is accurate and concise
 - [ ] Impact Analysis lists all contracts & data changes
 - [ ] **TDR includes Test Strategy with TDD plan and Spec→Test mapping**

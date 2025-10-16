@@ -1,8 +1,8 @@
 # Directive: Spec‑first approach to working with AI coding agents
 
-Spec first, chat less.
+Spec first, chat less. 
 
-A spec‑first approach to increase coding agent accuracy and developer efficiency. It replaces ad‑hoc back‑and‑forth with concise, versioned specs that become the canonical history of your work.
+Increase coding agent accuracy and developer efficiency by replacing ad‑hoc back‑and‑forth with concise, versioned specs that become the canonical history of your work.
 
 Problems this aims to solve:
 - **Improving agent accuracy and developer efficiency**: Clear specs reduce ambiguity and rework, speed up iterations, and align expectations between humans and agents.
