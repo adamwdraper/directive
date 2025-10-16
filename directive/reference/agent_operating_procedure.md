@@ -9,9 +9,10 @@ Note: Templates to use during this process are located in `/directive/reference/
 - Spec: `/directive/reference/templates/spec_template.md`
 - Impact: `/directive/reference/templates/impact_template.md`
 - TDR: `/directive/reference/templates/tdr_template.md`
+- Implementation: `/directive/reference/templates/implementation_template.md`
 
 ## Inputs
-- Spec folder for this PR (`/directive/specs/<feature>/`): contains `spec.md` and agent-produced docs (`impact.md`, `tdr.md`)
+- Spec folder for this PR (`/directive/specs/<feature>/`): contains `spec.md` and agent-produced docs (`impact.md`, `tdr.md`, `implementation.md`)
 - Agent Technical Context (`/directive/reference/agent_context.md`)
 - This AOP file
 
@@ -20,7 +21,13 @@ Note: Templates to use during this process are located in `/directive/reference/
 2. **Impact Analysis** — save as `/directive/specs/<feature>/impact.md`
 3. **Technical Design Review (TDR)** draft — save as `/directive/specs/<feature>/tdr.md`
 
+## Deliverables (during implementation)
+4. **Implementation Summary** — save as `/directive/specs/<feature>/implementation.md` — track actual changes, decisions, and test coverage
+
 ---
+
+## Step 0 — Branch Creation
+**Before starting work**: Create a feature branch from main using the naming convention `feature/<spec-name>` where `<spec-name>` matches your spec folder. Never work directly on main.
 
 ## Step 1 — Repo Recon (Codebase Map)
 Produce a short “you are here” map:
@@ -51,10 +58,12 @@ Create `/directive/specs/<feature>/tdr.md` using the TDR template at `/directive
 
 ## Step 4 — TDD Execution Rhythm (post‑approval)
 After TDR approval, proceed directly to implementation:
-1. **Write a failing test** that encodes the acceptance criterion (map to Spec Card).  
-2. **Run tests to confirm failure** (prove the test is meaningful).  
-3. **Implement the smallest change** to pass the test.  
-4. **Refactor** while keeping the test suite green.  
+1. **Create `implementation.md`** from the template — update it as you work.  
+2. **Write a failing test** that encodes the acceptance criterion (map to Spec Card).  
+3. **Run tests to confirm failure** (prove the test is meaningful).  
+4. **Implement the smallest change** to pass the test.  
+5. **Refactor** while keeping the test suite green.  
+6. **Update implementation.md** with files changed, decisions made, tests added.
 
 **Commit order per task**:  
 - `test: add failing test for <capability>`  
