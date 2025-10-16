@@ -1,6 +1,6 @@
 # Directive: Spec‑first approach to working with AI coding agents
 
-Write specs, not chats.
+Spec first, chat less.
 
 A spec‑first approach to increase coding agent accuracy and developer efficiency. It replaces ad‑hoc back‑and‑forth with concise, versioned specs that become the canonical history of your work.
 
