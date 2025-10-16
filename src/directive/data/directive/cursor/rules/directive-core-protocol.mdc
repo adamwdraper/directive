@@ -36,3 +36,4 @@ Templates:
 @directive/reference/templates/spec_template.md
 @directive/reference/templates/impact_template.md
 @directive/reference/templates/tdr_template.md
+@directive/reference/templates/implementation_template.md
