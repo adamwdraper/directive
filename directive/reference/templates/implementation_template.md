@@ -92,11 +92,6 @@ Map each acceptance criterion from the spec to test IDs:
 - Spec AC 1: "Given X when Y then Z" → `test_feature::test_scenario_1`
 - Spec AC 2: "Given X when Y then Z" → `test_feature::test_scenario_2`
 
-### Manual Testing Notes
-- <Any manual testing performed>
-- <Steps to reproduce/verify>
-- <Screenshots or output if relevant>
-
 ## Configuration Changes
 
 ### Environment Variables
@@ -117,13 +112,6 @@ Map each acceptance criterion from the spec to test IDs:
 ### Metrics
 - New metrics: `metric.name` — <description>
 - Modified metrics: `metric.name` — <what changed>
-
-### Dashboards
-- Created dashboard: `<dashboard-name>` — <link or description>
-- Updated dashboard: `<dashboard-name>` — <what was added>
-
-### Alerts
-- New alerts: `<alert-name>` — <conditions and severity>
 
 ## Security Considerations
 
@@ -152,43 +140,12 @@ Map each acceptance criterion from the spec to test IDs:
   - <Description of breaking change>
   - <Migration path for users>
 
-## Rollout Notes
-
-### Deployment Steps
-1. <Step-by-step deployment instructions>
-2. <Any required manual steps>
-
-### Rollback Plan
-- <How to rollback if issues arise>
-- <What data/state needs to be considered>
-
-### Feature Flag Strategy
-- <How feature will be rolled out>
-- <Percentage rollout plan if applicable>
-
-## Known Issues / Technical Debt
-- <Any known limitations or technical debt introduced>
-- <Future improvements planned>
-- <Workarounds or temporary solutions>
-
 ## Deviations from TDR
 If the implementation differs significantly from the TDR, document:
 - **What changed**: <description>
 - **Why it changed**: <rationale>
 - **Impact**: <what this means for the system>
 - **TDR updated?**: <Yes/No — if yes, reference TDR section>
-
-## Commit History Summary
-Brief summary of major commits in chronological order:
-- `<commit-hash>` — `test: add failing test for <feature>`
-- `<commit-hash>` — `feat: implement <feature>`
-- `<commit-hash>` — `refactor: improve <aspect>`
-
-## Review Notes
-Notes for reviewers on what to focus on:
-- <Specific areas needing careful review>
-- <Complex logic or algorithms>
-- <Security-sensitive code>
 
 ---
 
