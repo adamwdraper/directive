@@ -11,6 +11,8 @@ Problems this aims to solve:
 
 How it works (brief): Work is gated by explicit review checkpoints — **Spec → Impact → TDR** — with no code before approval. After approval, follow strict TDD with Spec→Test mapping. Everything lives in‑repo as plain files that agents can access directly, with optional MCP server integration for enhanced IDE features. See the supporting background in [Research & Rationale](#research--rationale).
 
+> **Note**: Directive is a *way of working* with agents, not a rigid standard. The templates, workflow, and rules are starting points designed to be customized for your team's practices. Think of it as best-practice scaffolding that you adapt to fit your specific needs — whether that's simplifying steps, adding domain-specific checks, or adjusting terminology. The goal is to give agents clear, consistent context that matches how you actually work.
+
 ## Quickstart
 
 - Install (using uv):
