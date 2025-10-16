@@ -32,36 +32,9 @@ How it works (brief): Work is gated by explicit review checkpoints — **Spec �
 1. Install and initialize:
    - `uv add directive`
    - `uv run directive init`
-2. Accept Cursor Project Rules when prompted (recommended):
+2. If working in Cursor, accept Cursor Project Rules when prompted (recommended):
    - Creates `.cursor/rules/directive-core-protocol.mdc` which tells agents to follow the Directive workflow
    - This is usually all you need — the directive files are plain text that agents can read directly
-
-### Optional: MCP Server (probably not needed)
-
-The MCP server provides programmatic access to templates and context files. **Most users won't need this** — agents work fine reading the `directive/` folder directly.
-
-If you want to set it up anyway (works with Cursor or any MCP-compatible tool):
-
-1. Create or update `.cursor/mcp.json` (or your IDE's equivalent):
-```json
-{
-  "mcpServers": {
-    "Directive": {
-      "type": "stdio",
-      "command": "/usr/bin/env",
-      "args": ["-S", "uv", "run", "-q", "-m", "directive.cli", "mcp", "serve"],
-      "transport": "stdio"
-    }
-  }
-}
-```
-
-2. The server exposes these tools:
-   - `directive/templates.spec`: Spec bundle (AOP, Agent Context, Spec template)
-   - `directive/templates.impact`: Impact bundle
-   - `directive/templates.tdr`: TDR bundle
-   - `directive/files.get`: Read any file under `directive/`
-   - `directive/files.list`: List all files under `directive/`
 
 ## Workflow
 
@@ -162,6 +135,33 @@ This framework is grounded in current best practices for **spec‑driven develop
 🔗 [Solo Dev Spec Loop (Indie Hackers)](https://www.indiehackers.com/post/spec-driven-ai-development)
 
 ---
+
+### Optional: MCP Server (probably not needed)
+
+The MCP server provides programmatic access to templates and context files. **Most users won't need this** — agents work fine reading the `directive/` folder directly.
+
+If you want to set it up anyway (works with Cursor or any MCP-compatible tool):
+
+1. Create or update `.cursor/mcp.json` (or your IDE's equivalent):
+```json
+{
+  "mcpServers": {
+    "Directive": {
+      "type": "stdio",
+      "command": "/usr/bin/env",
+      "args": ["-S", "uv", "run", "-q", "-m", "directive.cli", "mcp", "serve"],
+      "transport": "stdio"
+    }
+  }
+}
+```
+
+2. The server exposes these tools:
+   - `directive/templates.spec`: Spec bundle (AOP, Agent Context, Spec template)
+   - `directive/templates.impact`: Impact bundle
+   - `directive/templates.tdr`: TDR bundle
+   - `directive/files.get`: Read any file under `directive/`
+   - `directive/files.list`: List all files under `directive/`
 
 ### Takeaway
 - Specs must be **concise, testable, and versioned**.  
