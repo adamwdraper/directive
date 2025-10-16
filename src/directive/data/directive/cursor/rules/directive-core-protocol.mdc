@@ -9,6 +9,11 @@ Authoritative sources (read first):
 - Technical best practices → @directive/reference/agent_context.md
 - Your workflow & gates (how to code the Directive way) → @directive/reference/agent_operating_procedure.md
 
+🚨 FIRST STEP — FEATURE BRANCH (BEFORE ANYTHING ELSE):
+- Check current branch: `git branch --show-current`
+- If not on a feature branch, create one from main: `feature/<spec-name>` (must match spec folder)
+- NEVER work directly on main or master
+
 Pre‑implementation gates (must exist and be approved before any code):
 1) Spec → `/directive/specs/<feature>/spec.md`
 2) Impact Analysis → `/directive/specs/<feature>/impact.md`
