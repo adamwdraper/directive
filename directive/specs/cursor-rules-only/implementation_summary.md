@@ -3,7 +3,7 @@
 **Author**: AI Agent  
 **Start Date**: 2025-10-16  
 **Last Updated**: 2025-10-16  
-**Status**: Complete  
+**Status**: Complete (with post-implementation refinements)  
 **Branch**: `feature/cursor-rules-only`  
 **Links**: Spec (`/directive/specs/cursor-rules-only/spec.md`), TDR (`/directive/specs/cursor-rules-only/tdr.md`)
 
@@ -28,6 +28,21 @@ Removed MCP server configuration files from `directive init` workflow while pres
   - Updated `cmd_init()` to use new function and updated prompt text
   - Updated `cmd_update()` to not modify `.cursor/` directory
   - Marked `_copy_cursor_templates()` as deprecated but kept for reference
+
+- `src/directive/data/directive/cursor/rules/directive-core-protocol.mdc`:
+  - Added branch creation requirement section
+  - Updated template reference to implementation_summary_template.md
+
+- `.cursor/rules/directive-core-protocol.mdc`:
+  - Added branch creation requirement section (mirrors package data)
+  - Updated template reference to implementation_summary_template.md
+
+- `directive/reference/agent_operating_procedure.md`:
+  - Updated references from implementation.md to implementation_summary.md
+  - Already had branch creation step
+
+- `src/directive/data/directive/reference/agent_operating_procedure.md`:
+  - Updated references from implementation.md to implementation_summary.md (mirrors above)
   
 - `tests/test_cli.py`:
   - Added `test_init_creates_rules_not_mcp()` — verifies MCP files not created
@@ -37,12 +52,24 @@ Removed MCP server configuration files from `directive init` workflow while pres
   - Updated `test_cli_init_and_bundle_outputs_json()` to expect rules only, not MCP files
 
 - `README.md`:
+  - Updated tagline from "Write specs, not chats." to "Spec first, chat less."
   - Updated quickstart section to reflect new prompt text
-  - Clarified that MCP server is optional
-  - Updated "Using with Cursor" section to distinguish between rules and MCP setup
+  - Clarified that MCP server is optional in intro paragraph
+  - Changed section heading from "Quickstart (CLI + MCP)" to "Quickstart"
+  - Renamed "Using with Cursor" to "Using with Cursor (or any AI coding assistant)"
+  - Created separate "Optional: MCP Server (probably not needed)" section
+  - Emphasized agents work fine reading directive/ files directly
+  - Added note about Directive being customizable workflow, not rigid standard
+  - Simplified opening paragraph for directness
   
 - `pyproject.toml`:
   - Bumped version from 0.0.9 to 0.1.0 (minor version bump for breaking change)
+
+### Renamed Files
+- `directive/reference/templates/implementation_template.md` → `implementation_summary_template.md`
+- `src/directive/data/directive/reference/templates/implementation_template.md` → `implementation_summary_template.md`
+- `directive/specs/cursor-rules-only/implementation.md` → `implementation_summary.md`
+- All spec documents updated to reference new names
 
 ### Deleted Files
 None — all MCP server code preserved
@@ -207,14 +234,19 @@ None remaining.
 
 ## Commits
 
-Following conventional commits format:
+Following conventional commits format (11 commits total):
 
 1. `test: add failing tests for cursor-rules-only init behavior`
-2. `feat: implement _copy_cursor_rules_only to separate rules from MCP`
-3. `feat: update cmd_init to use rules-only function and new prompt`
-4. `feat: remove .cursor/ modifications from cmd_update`
-5. `docs: update README and create CHANGELOG for v0.1.0`
-6. `chore: bump version to 0.1.0`
+2. `feat: implement cursor-rules-only init behavior`
+3. `docs: update README, add CHANGELOG, and bump version to 0.1.0`
+4. `docs: clarify MCP server is optional in intro text`
+5. `docs: separate MCP server from Cursor setup and emphasize it's optional`
+6. `docs: add note emphasizing Directive is customizable workflow, not rigid standard`
+7. `docs: update tagline to 'Spec first, chat less.'`
+8. `docs: refine README intro for clarity and directness`
+9. `feat: add branch creation requirement to cursor rule`
+10. `docs: add implementation template to cursor rule templates list`
+11. `refactor: rename implementation_template to implementation_summary_template`
 
 ## Sign-off
 
