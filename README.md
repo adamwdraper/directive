@@ -61,7 +61,7 @@ Gates: Spec → Impact → TDR → Implementation (no code before TDR approval).
  
 ## Research & Rationale
 
-This framework is grounded in current best practices for **spec‑driven development** with AI coding agents. Below is a distilled summary of the sources we align to and the principles that inform the workflow.
+This framework is grounded in current best practices for **spec‑driven development** with AI coding agents. Below is a distilled summary of the sources directive took inspiration from and the principles that inform this workflow.
 
 ---
 
@@ -72,100 +72,48 @@ This framework is grounded in current best practices for **spec‑driven develop
 - They drive planning, tasks, and validation.  
 - GitHub’s **Spec Kit** formalizes this into a 4-phase loop: **Specify → Plan → Tasks → Implement**.  
 - Specs aren’t static — they are executable artifacts that evolve with the codebase.  
-🔗 [Spec Kit (GitHub Blog)](https://github.blog/news-insights/product-news/spec-kit/)
+🔗 [ Spec-Driven Development with AI](https://github.blog/ai-and-ml/generative-ai/spec-driven-development-with-ai-get-started-with-a-new-open-source-toolkit/)
 
 ---
 
-### 2. Separate the Stable “What” from the Flexible “How”
-- Capture **what** the system must do in product terms (user outcomes, interfaces, acceptance criteria).  
-- Keep **how** it is built flexible and expressed later in technical design docs.  
-- Example: Kiro’s approach outputs `requirements.md`, `design.md`, and `tasks.md` separately.  
-🔗 [Kiro: Spec-First Development](https://kirorun.notion.site/Kiro-Spec-First-Development-Docs)
-
----
-
-### 3. Tie Every Requirement to a Test (“Executable Specs”)
+### 2. Tie Every Requirement to a Test (“Executable Specs”)
 - Every spec clause must map to a test, often written in **Given–When–Then** (BDD style).  
 - Track **spec coverage** (all spec items tested) in addition to code coverage.  
 - This ensures agents are judged against explicit requirements, not guesses.  
-🔗 [Executable Specifications & BDD (Cucumber)](https://cucumber.io/docs/bdd/)
+🔗 [Executable Specifications & BDD (Cucumber)](https://cucumber.io/docs/)
 
 ---
 
-### 4. Use the Agent to Draft the Spec, Humans to Edit
+### 3. Use the Agent to Draft the Spec, Humans to Edit
 - Approaches like **“Vibe Specs”** let the LLM propose the first draft through Q&A.  
 - Humans then critique, clarify, and cut scope creep.  
 - The refined spec becomes the north star for implementation.  
-🔗 [Vibe Spec Method](https://vibespec.org/)
+🔗 [Vibe Spec Method](https://lukebechtel.com/blog/vibe-speccing/)
 
 ---
 
-### 5. Practice “Context Engineering,” Not Just Prompting
+### 4. Practice “Context Engineering,” Not Just Prompting
 - Agents perform better when given **durable, file-based context packs**:  
   - Rules/conventions  
   - Example code patterns  
   - Data contracts and schemas  
   - Documentation links  
 - Repos that include a **global rules file** plus examples see much higher fidelity.  
-🔗 [Context Engineering (GitHub Copilot best practices)](https://github.blog/ai-and-ml/context-engineering-for-agents/)
+🔗 [Context Engineering (GitHub Copilot best practices)](https://github.blog/ai-and-ml/github-copilot/how-to-build-reliable-ai-workflows-with-agentic-primitives-and-context-engineering/)
 
 ---
 
-### 6. Choose Method by Risk/Complexity; Enforce Verification
+### 5. Choose Method by Risk/Complexity; Enforce Verification
 - For low-risk features: lightweight specs may suffice.  
 - For high-risk or complex builds: follow **Spec-Then-Code**, with rigorous review gates.  
 - Use **multi-AI cross-review** or human checkpoints where the blast radius is large.  
-🔗 [Spec-Then-Code Methodology](https://www.spec.dev/spec-then-code)
+🔗 [Spec-Then-Code Methodology](https://github.com/mosofsky/spec-then-code?utm_source=chatgpt.com)
 
 ---
 
-### 7. Industry is Moving Toward Templates
+### 6. Industry is Moving Toward Templates
 - Beyond open-source tools, groups like **TM Forum** have published formal **AI Agent Specification Templates** for enterprise contexts.  
 - Standardization is arriving, which signals the importance of shared spec formats.  
 🔗 [TM Forum AI Agent Specification Template](https://www.tmforum.org/)
-
----
-
-### 8. A Pragmatic Solo/Dev Flow Works Today
-- A repeatable loop many developers use:  
-  1. Brainstorm a spec  
-  2. Generate a step-by-step plan  
-  3. Execute with a codegen agent in **small, testable chunks**  
-  4. Keep artifacts checked into the repo (`spec.md`, `prompt_plan.md`, `todo.md`).  
-🔗 [Solo Dev Spec Loop (Indie Hackers)](https://www.indiehackers.com/post/spec-driven-ai-development)
-
----
-
-### Optional: MCP Server (probably not needed)
-
-The MCP server provides programmatic access to templates and context files. **Most users won't need this** — agents work fine reading the `directive/` folder directly.
-
-If you want to set it up anyway (works with Cursor or any MCP-compatible tool):
-
-1. Create or update `.cursor/mcp.json` (or your IDE's equivalent):
-```json
-{
-  "mcpServers": {
-    "Directive": {
-      "type": "stdio",
-      "command": "/usr/bin/env",
-      "args": ["-S", "uv", "run", "-q", "-m", "directive.cli", "mcp", "serve"],
-      "transport": "stdio"
-    }
-  }
-}
-```
-
-2. The server exposes these tools:
-   - `directive/templates.spec`: Spec bundle (AOP, Agent Context, Spec template)
-   - `directive/templates.impact`: Impact bundle
-   - `directive/templates.tdr`: TDR bundle
-   - `directive/files.get`: Read any file under `directive/`
-   - `directive/files.list`: List all files under `directive/`
-
-### Takeaway
-- Specs must be **concise, testable, and versioned**.  
-- AI agents thrive when specs are paired with **context packs** and a **TDD-first workflow**.  
-- The winning approach is not over-specifying implementation, but rigorously specifying **outcomes, contracts, and tests**.
 
 
