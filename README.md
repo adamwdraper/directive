@@ -34,7 +34,7 @@ How it works (brief): Work is gated by explicit review checkpoints — **Spec �
    - `uv run directive init`
 2. If working in Cursor, accept Cursor Project Rules when prompted (recommended):
    - Creates `.cursor/rules/directive-core-protocol.mdc` which tells agents to follow the Directive workflow
-   - This is usually all you need — the directive files are plain text that agents can read directly
+   - This is usually all you need — the directive files are markdown that agents can read directly
 
 ## Workflow
 
