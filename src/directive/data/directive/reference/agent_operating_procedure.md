@@ -5,32 +5,56 @@ This is the **standard workflow** the agent must follow for every new feature sp
 
 ---
 
-Note: Templates to use during this process are located in `/directive/reference/templates/`:
+## 🚨 FIRST STEP — CREATE FEATURE BRANCH 🚨
+
+**BEFORE doing ANYTHING else (before drafting spec, before analysis, before ANY work):**
+
+1. Check current branch: `git branch --show-current`
+2. If not already on a feature branch, create one from main:
+   - **Spec folder naming**: `YYYYMMDD-feature-name/` (use current date in YYYYMMDD format)
+   - **Branch naming**: `feature/YYYYMMDD-feature-name` 
+   - The branch name MUST match your spec folder name
+3. **NEVER work directly on main or master**
+
+**Naming Convention**:
+- All new specs use date-based prefixes: `YYYYMMDD-feature-name/`
+- Use the current date when creating the spec (e.g., `20251031-spec-ordering/`)
+- If multiple specs created same day, use distinct feature names to differentiate
+- Example: For a spec created on October 31, 2025 → `/directive/specs/20251031-feature-name/` → branch `feature/20251031-feature-name`
+
+**Note**: Existing unprefixed spec directories (created before this convention) remain as-is.
+
+---
+
+**Templates**: All templates now include metadata fields (Spec ID, Created date) located in `/directive/reference/templates/`:
 - Spec: `/directive/reference/templates/spec_template.md`
 - Impact: `/directive/reference/templates/impact_template.md`
 - TDR: `/directive/reference/templates/tdr_template.md`
 - Implementation Summary: `/directive/reference/templates/implementation_summary_template.md`
 
+**Metadata Fields**:
+- `**Spec ID**: YYYYMMDD` — Use the current date in YYYYMMDD format (e.g., 20251031)
+- `**Created**: YYYY-MM-DD` — Use the current date in YYYY-MM-DD format (e.g., 2025-10-31)
+
 ## Inputs
-- Spec folder for this PR (`/directive/specs/<feature>/`): contains `spec.md` and agent-produced docs (`impact.md`, `tdr.md`, `implementation_summary.md`)
+- Spec folder for this PR (`/directive/specs/YYYYMMDD-feature/`): contains `spec.md` and agent-produced docs (`impact.md`, `tdr.md`, `implementation_summary.md`)
 - Agent Technical Context (`/directive/reference/agent_context.md`)
 - This AOP file
 
 ## Deliverables (before any code)
-1. **Spec** — collaboratively drafted and accepted — saved at `/directive/specs/<feature>/spec.md`
-2. **Impact Analysis** — save as `/directive/specs/<feature>/impact.md`
-3. **Technical Design Review (TDR)** draft — save as `/directive/specs/<feature>/tdr.md`
+**⚠️ Reminder: All deliverables must be created on a feature branch, not main**
+
+1. **Spec** — collaboratively drafted and accepted — saved at `/directive/specs/YYYYMMDD-feature/spec.md`
+2. **Impact Analysis** — save as `/directive/specs/YYYYMMDD-feature/impact.md`
+3. **Technical Design Review (TDR)** draft — save as `/directive/specs/YYYYMMDD-feature/tdr.md`
 
 ## Deliverables (during implementation)
-4. **Implementation Summary** — save as `/directive/specs/<feature>/implementation_summary.md` — track actual changes, decisions, and test coverage
+4. **Implementation Summary** — save as `/directive/specs/YYYYMMDD-feature/implementation_summary.md` — track actual changes, decisions, and test coverage
 
 ---
 
-## Step 0 — Branch Creation
-**Before starting work**: Create a feature branch from main using the naming convention `feature/<spec-name>` where `<spec-name>` matches your spec folder. Never work directly on main.
-
 ## Step 1 — Repo Recon (Codebase Map)
-Produce a short “you are here” map:
+Produce a short "you are here" map:
 - Entry points, services, key modules
 - Current data models and important tables/collections
 - External interfaces (APIs, events, webhooks, queues)
@@ -52,7 +76,7 @@ From the spec, identify:
 **Gate**: Reviewer signs off on `impact.md` before proceeding to TDR.
 
 ## Step 3 — Draft the TDR
-Create `/directive/specs/<feature>/tdr.md` using the TDR template at `/directive/reference/templates/tdr_template.md`. Keep it high-level and implementation‑agnostic but **decisive** about interfaces and behavior. Link to examples and data contracts.
+Create `/directive/specs/YYYYMMDD-feature/tdr.md` using the TDR template at `/directive/reference/templates/tdr_template.md`. Keep it high-level and implementation‑agnostic but **decisive** about interfaces and behavior. Link to examples and data contracts.
 
 **Gate**: Wait for reviewer (human) approval comments.
 
@@ -85,6 +109,7 @@ After TDR approval, proceed directly to implementation:
 ---
 
 ## Review Checklist (pre‑implementation)
+- [ ] **Working on feature branch (not main) — verify with `git branch --show-current`**
 - [ ] Codebase Map is accurate and concise
 - [ ] Impact Analysis lists all contracts & data changes
 - [ ] **TDR includes Test Strategy with TDD plan and Spec→Test mapping**

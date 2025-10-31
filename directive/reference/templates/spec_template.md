@@ -1,5 +1,8 @@
 # Spec (per PR)
 
+**Spec ID**: YYYYMMDD  
+**Created**: YYYY-MM-DD  
+
 **Feature name**:  
 **One-line summary**: (what this adds for the user)  
 
