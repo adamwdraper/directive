@@ -37,7 +37,8 @@ Attach this file + the feature spec to the agent for every build.
 
 ## Commit & PR Conventions
 - Conventional commits (`feat:`, `fix:`, `chore:`)  
-- Every PR must include a Spec Card (`directive/specs/feature-name.md`)  
+- Every PR must include a Spec Card (`directive/specs/YYYYMMDD-feature-name/spec.md`)
+- Spec directories use date-based naming: `YYYYMMDD-feature-name/` (e.g., `20251031-spec-ordering/`)  
 
 ---
 
@@ -46,7 +47,7 @@ Attach this file + the feature spec to the agent for every build.
 ## Test-Driven Development (TDD) Rules
 
 1) **Write a failing test first** for each acceptance criterion.  
-2) **Confirm failure** to validate the test’s effectiveness.  
+2) **Confirm failure** to validate the test's effectiveness.  
 3) **Implement minimal code** to pass.  
 4) **Refactor** keeping the suite green.  
 
@@ -55,5 +56,3 @@ Attach this file + the feature spec to the agent for every build.
 - Naming: map tests to Spec acceptance criteria (e.g., `AC-3`)  
 - Commit order per task: `test:` → `feat:` → `refactor:`  
 - CI blocks merge unless all tests pass  
-
-
