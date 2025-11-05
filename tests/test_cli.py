@@ -147,3 +147,255 @@ def test_init_prompt_no_mcp_mention(tmp_path: Path):
     assert "mcp.json" not in output
 
 
+# ============================================================================
+# Tests for selective update functionality
+# ============================================================================
+
+def test_update_shows_preview(tmp_path: Path, monkeypatch):
+    """Test that update shows preview of files to be overwritten before making changes."""
+    from directive import cli as dcli
+    
+    class Args:
+        verbose = False
+    
+    # Setup: Initialize directive
+    _run_cli(["init"], tmp_path)
+    
+    # Capture output and mock user declining (so we only test preview)
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("sys.stdin.isatty", lambda: True)
+    monkeypatch.setattr("builtins.input", lambda _: "n")  # Decline to test preview only
+    
+    import io
+    captured = io.StringIO()
+    monkeypatch.setattr("sys.stdout", captured)
+    
+    rc = dcli.cmd_update(Args())
+    output = captured.getvalue()
+    
+    # Should show what will be updated
+    assert "will be updated" in output.lower() or "will be overwritten" in output.lower()
+    assert "agent_operating_procedure.md" in output
+    assert "spec_template.md" in output
+    
+    # Should show what will NOT be modified
+    assert "will NOT be modified" in output or "will not be" in output.lower()
+    assert "agent_context.md" in output
+    assert "specs/" in output
+
+
+def test_update_confirms_and_overwrites(tmp_path: Path, monkeypatch):
+    """Test that confirmed update actually overwrites maintained files."""
+    from directive import cli as dcli
+    
+    class Args:
+        verbose = False
+    
+    # Setup: Initialize directive
+    _run_cli(["init"], tmp_path)
+    
+    # Modify a maintained file with old content
+    aop_file = tmp_path / "directive" / "reference" / "agent_operating_procedure.md"
+    original_content = aop_file.read_text()
+    aop_file.write_text("OLD CONTENT - THIS SHOULD BE OVERWRITTEN")
+    
+    # Also modify a template
+    spec_template = tmp_path / "directive" / "reference" / "templates" / "spec_template.md"
+    spec_template.write_text("OLD TEMPLATE CONTENT")
+    
+    # Confirm the update
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("sys.stdin.isatty", lambda: True)
+    monkeypatch.setattr("builtins.input", lambda _: "Y")
+    
+    rc = dcli.cmd_update(Args())
+    assert rc == 0
+    
+    # Files should be overwritten with package content
+    assert aop_file.read_text() != "OLD CONTENT - THIS SHOULD BE OVERWRITTEN"
+    assert spec_template.read_text() != "OLD TEMPLATE CONTENT"
+    # Should contain actual content from package
+    assert "Agent Operating Procedure" in aop_file.read_text() or "AOP" in aop_file.read_text()
+
+
+def test_update_declines_no_changes(tmp_path: Path, monkeypatch):
+    """Test that declining update makes no changes to files."""
+    from directive import cli as dcli
+    
+    class Args:
+        verbose = False
+    
+    # Setup: Initialize directive
+    _run_cli(["init"], tmp_path)
+    
+    # Modify a maintained file
+    aop_file = tmp_path / "directive" / "reference" / "agent_operating_procedure.md"
+    old_content = "OLD CONTENT - SHOULD NOT CHANGE"
+    aop_file.write_text(old_content)
+    
+    # Decline the update
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("sys.stdin.isatty", lambda: True)
+    monkeypatch.setattr("builtins.input", lambda _: "n")
+    
+    rc = dcli.cmd_update(Args())
+    assert rc == 0
+    
+    # File should remain unchanged
+    assert aop_file.read_text() == old_content
+
+
+def test_update_noninteractive_autoconfirms(tmp_path: Path, monkeypatch):
+    """Test that non-interactive mode auto-confirms and proceeds with updates."""
+    from directive import cli as dcli
+    
+    class Args:
+        verbose = False
+    
+    # Setup: Initialize directive
+    _run_cli(["init"], tmp_path)
+    
+    # Modify a maintained file
+    aop_file = tmp_path / "directive" / "reference" / "agent_operating_procedure.md"
+    aop_file.write_text("OLD CONTENT")
+    
+    # Simulate non-interactive environment (non-TTY)
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("sys.stdin.isatty", lambda: False)
+    
+    rc = dcli.cmd_update(Args())
+    assert rc == 0
+    
+    # File should be overwritten (auto-confirmed)
+    assert aop_file.read_text() != "OLD CONTENT"
+
+
+def test_update_no_directive_dir(tmp_path: Path, monkeypatch):
+    """Test that update shows helpful error when directive/ doesn't exist."""
+    from directive import cli as dcli
+    
+    class Args:
+        verbose = False
+    
+    monkeypatch.chdir(tmp_path)
+    
+    import io
+    captured_err = io.StringIO()
+    monkeypatch.setattr("sys.stderr", captured_err)
+    
+    rc = dcli.cmd_update(Args())
+    assert rc == 1  # Error exit code
+    
+    error_output = captured_err.getvalue()
+    assert "directive" in error_output.lower()
+    assert "init" in error_output.lower()
+
+
+def test_update_preserves_agent_context(tmp_path: Path, monkeypatch):
+    """Test that update never modifies agent_context.md."""
+    from directive import cli as dcli
+    
+    class Args:
+        verbose = False
+    
+    # Setup: Initialize directive
+    _run_cli(["init"], tmp_path)
+    
+    # Customize agent_context.md
+    context_file = tmp_path / "directive" / "reference" / "agent_context.md"
+    custom_content = "# MY CUSTOM PROJECT CONTEXT\nThis is my custom content."
+    context_file.write_text(custom_content)
+    
+    # Run update and confirm
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("sys.stdin.isatty", lambda: True)
+    monkeypatch.setattr("builtins.input", lambda _: "Y")
+    
+    rc = dcli.cmd_update(Args())
+    assert rc == 0
+    
+    # agent_context.md should remain unchanged
+    assert context_file.read_text() == custom_content
+
+
+def test_update_overwrites_cursor_rules(tmp_path: Path, monkeypatch):
+    """Test that update overwrites cursor rules from package."""
+    from directive import cli as dcli
+    
+    class Args:
+        verbose = False
+    
+    # Setup: Initialize directive
+    _run_cli(["init"], tmp_path)
+    
+    # Modify cursor rule
+    cursor_rule = tmp_path / ".cursor" / "rules" / "directive-core-protocol.mdc"
+    cursor_rule.write_text("OLD CURSOR RULE CONTENT")
+    
+    # Run update and confirm
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("sys.stdin.isatty", lambda: True)
+    monkeypatch.setattr("builtins.input", lambda _: "Y")
+    
+    rc = dcli.cmd_update(Args())
+    assert rc == 0
+    
+    # Cursor rule should be overwritten
+    assert cursor_rule.read_text() != "OLD CURSOR RULE CONTENT"
+
+
+def test_update_preserves_specs(tmp_path: Path, monkeypatch):
+    """Test that update never modifies specs/ directory."""
+    from directive import cli as dcli
+    
+    class Args:
+        verbose = False
+    
+    # Setup: Initialize directive
+    _run_cli(["init"], tmp_path)
+    
+    # Create a spec with custom content
+    spec_dir = tmp_path / "directive" / "specs" / "my-feature"
+    spec_dir.mkdir(parents=True)
+    spec_file = spec_dir / "spec.md"
+    custom_spec = "# My Custom Spec\nThis should never be touched."
+    spec_file.write_text(custom_spec)
+    
+    # Run update and confirm
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("sys.stdin.isatty", lambda: True)
+    monkeypatch.setattr("builtins.input", lambda _: "Y")
+    
+    rc = dcli.cmd_update(Args())
+    assert rc == 0
+    
+    # Spec should remain unchanged
+    assert spec_file.read_text() == custom_spec
+    assert spec_dir.exists()
+
+
+def test_update_verbose_flag(tmp_path: Path, monkeypatch):
+    """Test that verbose flag shows detailed output."""
+    from directive import cli as dcli
+    
+    class Args:
+        verbose = True
+    
+    # Setup: Initialize directive
+    _run_cli(["init"], tmp_path)
+    
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("sys.stdin.isatty", lambda: True)
+    monkeypatch.setattr("builtins.input", lambda _: "Y")
+    
+    import io
+    captured = io.StringIO()
+    monkeypatch.setattr("sys.stdout", captured)
+    
+    rc = dcli.cmd_update(Args())
+    output = captured.getvalue()
+    
+    # Verbose should show more detail
+    assert len(output) > 0
+
+
