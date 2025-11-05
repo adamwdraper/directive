@@ -54,7 +54,7 @@ This is the **standard workflow** the agent must follow for every new feature sp
 ---
 
 ## Step 1 — Repo Recon (Codebase Map)
-Produce a short “you are here” map:
+Produce a short "you are here" map:
 - Entry points, services, key modules
 - Current data models and important tables/collections
 - External interfaces (APIs, events, webhooks, queues)

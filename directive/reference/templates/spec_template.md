@@ -16,7 +16,7 @@ What should exist when this is done? (concise outcome statement)
 
 ## Success Criteria
 - [ ] Clear, measurable user outcome or KPI  
-- [ ] Qualitative improvement if metrics aren’t available  
+- [ ] Qualitative improvement if metrics aren't available  
 
 ## User Story
 As a [user type], I want [capability], so that [benefit].  
@@ -40,4 +40,4 @@ Links to designs, copy, or prototypes (e.g., Figma files, screenshots, docs).
 - Include at least one negative case  
 
 ## Non-Goals
-What’s explicitly out of scope for this PR.  
+What's explicitly out of scope for this PR.  
