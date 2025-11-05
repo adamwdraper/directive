@@ -213,20 +213,106 @@ def cmd_init(args: argparse.Namespace) -> int:
     return 0
 
 
+def _get_maintained_files() -> Dict[str, List[str]]:
+    """Return dict of maintained file paths that should be updated.
+    
+    Returns:
+        {
+            'directive': ['reference/agent_operating_procedure.md', ...],
+            'cursor_rules': ['rules/directive-core-protocol.mdc', ...]
+        }
+    """
+    return {
+        'directive': [
+            'reference/agent_operating_procedure.md',
+            'reference/templates/spec_template.md',
+            'reference/templates/impact_template.md',
+            'reference/templates/tdr_template.md',
+            'reference/templates/implementation_summary_template.md',
+        ],
+        'cursor_rules': [
+            'rules/directive-core-protocol.mdc',
+        ]
+    }
+
+
+def _show_update_preview(repo_root: Path, maintained_files: Dict[str, List[str]]) -> None:
+    """Display preview of files that will be overwritten and those that won't."""
+    _print("\nThe following files will be updated (overwritten):")
+    
+    # Show directive files
+    for rel_path in maintained_files['directive']:
+        _print(f"  - directive/{rel_path}")
+    
+    # Show cursor rules
+    for rel_path in maintained_files['cursor_rules']:
+        _print(f"  - .cursor/{rel_path}")
+    
+    _print("\nFiles that will NOT be modified:")
+    _print("  - directive/reference/agent_context.md (your project-specific context)")
+    _print("  - directive/specs/ (your project history)")
+
+
 def cmd_update(args: argparse.Namespace) -> int:
+    """Update Directive-maintained files (templates, AOP, cursor rules).
+    
+    Shows preview, prompts for confirmation, then selectively overwrites
+    only the files that Directive maintains. Project-specific content
+    (agent_context.md, specs/) is never touched.
+    """
     repo_root = Path.cwd()
     target = repo_root.joinpath("directive")
     if not target.exists():
         _err("No directive/ found. Run 'directive init' first.")
         return 1
-    defaults = _package_data_root()
-    copied, skipped, notes = _copy_tree(defaults, target, overwrite=False)
-    _print(f"Updated directive/ (copied {copied} new files, left {skipped} unchanged)")
-    if args.verbose:
-        for n in notes:
-            _print(n)
-    # Note: We no longer update .cursor/ files to avoid modifying user's Cursor config
-    # Users can manually update Cursor rules if needed
+    
+    # Get list of maintained files
+    maintained_files = _get_maintained_files()
+    
+    # Show preview
+    _show_update_preview(repo_root, maintained_files)
+    
+    # Ask for confirmation
+    if not _ask_yes_no("Proceed with update?", default_yes=True):
+        _print("Update cancelled.")
+        return 0
+    
+    # Update directive/ maintained files
+    package_root = _package_data_root()
+    updated_count = 0
+    updated_files: List[str] = []
+    
+    for rel_path in maintained_files['directive']:
+        src = package_root.joinpath(rel_path)
+        dst = target.joinpath(rel_path)
+        if src.exists():
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst)
+            updated_count += 1
+            updated_files.append(f"directive/{rel_path}")
+            if args.verbose:
+                _print(f"  ✓ directive/{rel_path}")
+    
+    # Update cursor rules
+    cursor_src = package_root.joinpath("cursor")
+    cursor_dst = repo_root.joinpath(".cursor")
+    
+    for rel_path in maintained_files['cursor_rules']:
+        src = cursor_src.joinpath(rel_path)
+        dst = cursor_dst.joinpath(rel_path)
+        if src.exists():
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst)
+            updated_count += 1
+            updated_files.append(f".cursor/{rel_path}")
+            if args.verbose:
+                _print(f"  ✓ .cursor/{rel_path}")
+    
+    # Show summary
+    _print(f"\nUpdated {updated_count} file{'s' if updated_count != 1 else ''}:")
+    for file_path in updated_files:
+        _print(f"  ✓ {file_path}")
+    
     return 0
 
 
@@ -277,7 +363,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_init = sub.add_parser("init", help="Initialize directive/ with defaults (non-destructive)")
     p_init.set_defaults(func=cmd_init)
 
-    p_update = sub.add_parser("update", help="Update directive/ with any missing defaults")
+    p_update = sub.add_parser("update", help="Update Directive-maintained files (templates, AOP, cursor rules)")
     p_update.set_defaults(func=cmd_update)
 
     p_serve = sub.add_parser("mcp", help="MCP related commands")
